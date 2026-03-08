@@ -1,0 +1,56 @@
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+*.log
+
+# =========================
+# GODOT 4
+# =========================
+.godot/
+*.import
+export_presets.cfg
+export_credentials.cfg
+
+# =========================
+# SQLITE
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# GRAFANA
+# =========================
+grafana/data/
+grafana/logs/
+grafana/plugins/
+
+# =========================
+# VS CODE
+# =========================
+.vscode/
+*.code-workspace
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# DATA & REPORTS (optional)
+# =========================
+# Uncomment if you don't want to track raw data exports
+# data/*.csv
