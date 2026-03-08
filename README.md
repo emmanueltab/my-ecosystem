@@ -11,8 +11,8 @@ A continuously running server-based simulation of a living ecosystem populated b
 ┌──────────────────┐        ┌───────────────────┐
 │  PYTHON SERVER   │◄──────►│     GODOT 4       │
 │  FastAPI+SQLite  │        │  Visual World     │
-│                  │        │  Agents moving    │
-│  The Brain       │        │  around a grid    │
+│                  │        │  to visualize     |
+│  The Brain       │        │   the agents      │
 └────────┬─────────┘        └───────────────────┘
          │
          ▼
