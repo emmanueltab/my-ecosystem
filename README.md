@@ -1,10 +1,7 @@
 # 🌿 Ecosystem Simulation & Analytics Platform
+---
 
-A continuously running server-based simulation of a living ecosystem populated by autonomous entities. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time.
-
-Entities behave independently, governed by a defined set of programmer-designed rules, similar in concept to Conway's Game of Life. Each entity reacts to its environment and surrounding agents, producing complex and emergent behavior over time.
-
-Live dashboards connected to the simulation track and visualize key metrics — such as population counts, birth and death rates, and resource levels — updating periodically to provide ongoing insight into how the ecosystem evolves.
+A continuously running server-based simulation of a living ecosystem populated by autonomous, mathematically-themed entities. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. A built-in creature builder allows new entity types to be designed and dropped into the ecosystem while the simulation is actively running. Creatures are mathematically inspired — exhibiting behaviors such as parametric movement, spiral navigation, exponential reproduction, and vector-based pathfinding. The simulation exists in a dual-dimension environment where 3D creatures navigate freely in XYZ space while 2D creatures are locked to a flat plane, producing unique cross-dimensional interactions and emergent behavior. All simulation data is continuously logged to a database, powering live analytics dashboards and serving as the foundation for ongoing data science experiments, statistical analysis, and research reports.
 
 ---
 
