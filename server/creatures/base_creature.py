@@ -85,28 +85,56 @@ class BaseCreature:
         return visible
 
     def seek(self, world_objects, world_width, world_height):
-        """Looks for food or water and moves toward the closest one."""
         visible = self.look(world_objects)
 
-        if not visible:
-            self.wander(world_width, world_height)
-            return
-
         # separate food and water
-        food  = [o for o in visible if o.get_type() == "food"]
-        water = [o for o in visible if o.get_type() == "water"]
+        food  = [o for o in visible if o.get_type() == "food" and o.has_resource()]
+        water = [o for o in visible if o.get_type() == "water" and o.has_resource()]
 
-        # prioritize based on what's lower
-        if self.hunger <= self.thirst and food:
-            target = min(food, key=lambda o: math.dist(self.position, o.position))
-            self.move_toward(target.position, world_width, world_height)
-            self.interact(target)
-        elif water:
-            target = min(water, key=lambda o: math.dist(self.position, o.position))
-            self.move_toward(target.position, world_width, world_height)
-            self.interact(target)
+        # determine priority based on which stat is lower
+        hunger_percent = self.hunger / self.max_hunger
+        thirst_percent = self.thirst / self.max_thirst
+
+        if hunger_percent < thirst_percent:
+            # hunger is more urgent
+            if food:
+                target = min(food, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            elif water and thirst_percent < 0.5:
+                # no food visible but thirst is also getting low
+                target = min(water, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            else:
+                self.wander(world_width, world_height)
+
+        elif thirst_percent < hunger_percent:
+            # thirst is more urgent
+            if water:
+                target = min(water, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            elif food and hunger_percent < 0.5:
+                # no water visible but hunger is also getting low
+                target = min(food, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            else:
+                self.wander(world_width, world_height)
+
         else:
-            self.wander(world_width, world_height)
+            # both equal — seek whichever is visible
+            if food:
+                target = min(food, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            elif water:
+                target = min(water, key=lambda o: math.dist(self.position, o.position))
+                self.move_toward(target.position, world_width, world_height)
+                self.interact(target)
+            else:
+                self.wander(world_width, world_height)
 
     def interact(self, world_object):
         """Interacts with a world object if close enough."""

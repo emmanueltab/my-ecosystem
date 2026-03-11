@@ -3,6 +3,7 @@ import random
 from creatures.r2.rabbit import Rabbit
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
+import math
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
@@ -59,10 +60,13 @@ class Simulation:
         # handle reproduction
         new_creatures = []
         for creature in self.creatures.values():
-            offspring = creature.reproduce()
+            nearby = [c for c in self.creatures.values()
+                      if c != creature
+                      and math.dist(creature.position, c.position) <= creature.vision_range]
+            offspring = creature.reproduce(nearby)
             if offspring:
                 new_creatures.append(offspring)
-                print(f"New {offspring.name} born!")
+                print(f"New {offspring.name} [{offspring.sex}] born!")
 
         for offspring in new_creatures:
             self.add_creature(offspring)
