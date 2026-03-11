@@ -3,7 +3,7 @@ import random
 import math
 
 class BaseCreature:
-    def __init__(self, name, dimension, position, speed, vision_range,
+    def __init__(self, name, dimension, position, speed, vision_range, 
                  max_hunger, max_thirst, max_energy):
         # Identity
         self.id           = str(uuid.uuid4())
@@ -11,6 +11,11 @@ class BaseCreature:
         self.dimension    = dimension
         self.alive        = True
         self.age          = 0
+
+        # Reproduction
+        self.sex                    = self.assign_sex()
+        self.reproduction_threshold = 80
+        self.reproduction_cooldown  = 0
 
         # Movement
         self.position     = position
@@ -130,6 +135,25 @@ class BaseCreature:
         """Randomly changes direction and moves."""
         self.direction = random.uniform(0, 360)
         self.move(world_width, world_height)
+
+
+    # reproduction:
+    def assign_sex(self):
+        """Override in child class to define how sex is assigned.
+        Returns True for Female, False for Male by default."""
+        return random.choice([True, False])
+
+    @property
+    def ready_to_reproduce(self):
+        """Returns True if creature is able to reproduce."""
+        return (self.alive
+                and self.reproduction_cooldown == 0
+                and self.hunger >= self.reproduction_threshold
+                and self.thirst >= self.reproduction_threshold)
+
+    def reproduce(self, nearby_creatures):
+        """Override in child class to define reproduction behavior."""
+        pass
 
     def die(self):
         """Marks creature as dead."""
