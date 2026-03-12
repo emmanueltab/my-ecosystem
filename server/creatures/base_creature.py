@@ -4,7 +4,7 @@ import math
 
 class BaseCreature:
     def __init__(self, name, dimension, position, speed, vision_range, 
-                 max_hunger, max_thirst, max_energy):
+                 max_hunger, max_thirst):
         # Identity
         self.id           = str(uuid.uuid4())
         self.name         = name
@@ -31,12 +31,8 @@ class BaseCreature:
         self.max_thirst   = max_thirst
         self.thirst       = max_thirst
 
-        # Energy
-        self.max_energy   = None
-        self.energy       = max_energy
-
     def update(self):
-        """Called every tick. Creatures die if energy depleted or low age"""
+        """Called every tick. Creatures die if hunger is depleted or low age"""
         if self.alive:
             self.age    += 1
             self.hunger -= 1

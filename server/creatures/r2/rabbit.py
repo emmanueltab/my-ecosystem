@@ -11,7 +11,6 @@ class Rabbit(BaseCreature):
             vision_range = 10,
             max_hunger   = 100,
             max_thirst   = 100,
-            max_energy   = 100
         )
         # rabbit specific properties
         self.max_age               = 200
