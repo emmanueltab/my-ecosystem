@@ -1,3 +1,4 @@
+import random
 from creatures.base_creature import BaseCreature
 
 class Rabbit(BaseCreature):
@@ -10,9 +11,13 @@ class Rabbit(BaseCreature):
             vision_range = 10,
             max_hunger   = 100,
             max_thirst   = 100,
-            max_energy   = 100,
-            max_age = 200
+            max_energy   = 100
         )
+        # rabbit specific properties
+        self.max_age               = 200
+        self.sex                   = random.choice([True, False])
+        self.reproduction_threshold = 80
+        self.reproduction_cooldown  = 0
 
     def reproduce(self, nearby_creatures):
         # only females reproduce
@@ -30,7 +35,7 @@ class Rabbit(BaseCreature):
             self.hunger               -= 20
             self.thirst               -= 20
             self.reproduction_cooldown = 10
-            mate.reproduction_cooldown = 10    # male also goes on cooldown
+            mate.reproduction_cooldown = 10
             return Rabbit(self.position)
 
         return None
