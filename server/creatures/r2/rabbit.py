@@ -10,7 +10,8 @@ class Rabbit(BaseCreature):
             vision_range = 10,
             max_hunger   = 100,
             max_thirst   = 100,
-            max_energy   = 100
+            max_energy   = 100,
+            max_age = 200
         )
 
     def reproduce(self, nearby_creatures):

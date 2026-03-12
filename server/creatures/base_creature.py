@@ -32,16 +32,18 @@ class BaseCreature:
         self.thirst       = max_thirst
 
         # Energy
-        self.max_energy   = max_energy
+        self.max_energy   = None
         self.energy       = max_energy
 
     def update(self):
-        """Called every tick."""
+        """Called every tick. Creatures die if energy depleted or low age"""
         if self.alive:
             self.age    += 1
             self.hunger -= 1
             self.thirst -= 2
             if self.hunger <= 0 or self.thirst <= 0:
+                self.die()
+            if self.max_age is not None and self.age >= self.max_age:
                 self.die()
 
     def move(self, world_width, world_height):
