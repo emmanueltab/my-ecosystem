@@ -51,6 +51,11 @@ Thumbs.db
 desktop.ini
 
 # =========================
+# DATABASE
+# =========================
+server/data/
+
+# =========================
 # DATA & REPORTS (optional)
 # =========================
 # Uncomment if you don't want to track raw data exports
