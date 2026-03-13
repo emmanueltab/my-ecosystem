@@ -24,7 +24,7 @@ for i in range(10):
     position = (random.uniform(0, 100), random.uniform(0, 100))
     sim.add_water(WaterSource(position))
 
-sim.run(ticks=50)
+sim.run(ticks=20)
 
 db.close()
 print("Database closed")

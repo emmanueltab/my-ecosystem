@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 class Database:
-    def __init__(self, db_path="/serverdata/ecosystem.db"):
+    def __init__(self, db_path="/data/ecosystem.db"):
         # create data/ folder if it doesn't exist
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         
