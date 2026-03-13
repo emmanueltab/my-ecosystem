@@ -54,6 +54,7 @@ desktop.ini
 # DATABASE
 # =========================
 server/data/
+server/data/*.db
 
 # =========================
 # DATA & REPORTS (optional)
