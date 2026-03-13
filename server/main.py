@@ -5,26 +5,34 @@ from creatures.r2.water_source import WaterSource
 from database import Database
 import random
 
-db = Database()
+# ── Configure run here ──────────────────────────────
+RESUME    = True   # set True to resume an existing run
+RESUME_ID = 1       # run id to resume (check DB Browser)
+# ────────────────────────────────────────────────────
 
-sim = Simulation()
+db  = Database()
+sim = Simulation(db=db)
 
-# spawn 5 rabbits
-for i in range(20):
-    position = (random.uniform(0, 100), random.uniform(0, 100))
-    sim.add_creature(Rabbit(position))
-
-# spawn 3 food sources
-for i in range(10):
-    position = (random.uniform(0, 100), random.uniform(0, 100))
-    sim.add_food(FoodSource(position))
-
-# spawn 3 water sources
-for i in range(10):
-    position = (random.uniform(0, 100), random.uniform(0, 100))
-    sim.add_water(WaterSource(position))
+if RESUME:
+    db.resume_run(RESUME_ID)
+    sim.load_state(db, RESUME_ID)
+else:
+    db.start_run(
+        name  = "Run 1 — baseline",
+        notes = "20 rabbits, 10 food, 10 water, 100x100 world"
+    )
+    for i in range(20):
+        position = (random.uniform(0, 100), random.uniform(0, 100))
+        sim.add_creature(Rabbit(position))
+    for i in range(10):
+        position = (random.uniform(0, 100), random.uniform(0, 100))
+        sim.add_food(FoodSource(position))
+    for i in range(10):
+        position = (random.uniform(0, 100), random.uniform(0, 100))
+        sim.add_water(WaterSource(position))
 
 sim.run(ticks=20)
 
+db.end_run()
 db.close()
-print("Database closed")
+print("Database closed.")

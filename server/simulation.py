@@ -1,18 +1,21 @@
 import time
 import random
-from creatures.r2.rabbit import Rabbit
-from creatures.r2.food_source import FoodSource
-from creatures.r2.water_source import WaterSource
 import math
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
+from creatures.r2.rabbit import Rabbit
+from creatures.r2.food_source import FoodSource
+from creatures.r2.water_source import WaterSource
 
 class Simulation:
-    def __init__(self, world_width=100, world_height=100):
+    def __init__(self, world_width=100, world_height=100, db=None):
         # World boundaries
         self.world_width   = world_width
         self.world_height  = world_height
+
+        # Database
+        self.db            = db
 
         # Simulation objects
         self.creatures     = {}
@@ -74,6 +77,52 @@ class Simulation:
         self.remove_dead()
         print(f"Population: {len(self.creatures)}")
 
+        # save to database if connected
+        if self.db:
+            tick_id = self.db.save_tick(self.tick_count, len(self.creatures))
+            self.db.save_creature_states(tick_id, self.creatures)
+            self.db.save_resource_states(tick_id, self.food_sources, self.water_sources)
+
+    def load_state(self, db, run_id):
+        """Loads the last saved state of a run."""
+        result = db.get_last_tick(run_id)
+        if not result:
+            print("No saved state found.")
+            return
+
+        tick_id, tick_number = result
+        self.tick_count      = tick_number
+        print(f"Loading state from tick {tick_number}...")
+
+        # reload creatures
+        for row in db.get_creature_states(tick_id):
+            creature_id, species, sex, age, hunger, thirst, pos_x, pos_y = row
+            if species == "Rabbit":
+                rabbit              = Rabbit((pos_x, pos_y))
+                rabbit.id           = creature_id
+                rabbit.sex          = True if sex == "F" else False
+                rabbit.age          = age
+                rabbit.hunger       = hunger
+                rabbit.thirst       = thirst
+                self.add_creature(rabbit)
+
+        # reload resources
+        for row in db.get_resource_states(tick_id):
+            resource_id, resource_type, quantity, pos_x, pos_y = row
+            if resource_type == "food":
+                food          = FoodSource((pos_x, pos_y))
+                food.id       = resource_id
+                food.quantity = quantity
+                self.add_food(food)
+            elif resource_type == "water":
+                water          = WaterSource((pos_x, pos_y))
+                water.id       = resource_id
+                water.quantity = quantity
+                self.add_water(water)
+
+        print(f"Loaded {len(self.creatures)} creatures and "
+              f"{len(self.food_sources) + len(self.water_sources)} resources.")
+
     def run(self, ticks=20):
         self.running = True
         plt.ion()
@@ -104,18 +153,13 @@ class Simulation:
         plt.xlim(0, self.world_width)
         plt.ylim(0, self.world_height)
 
-        # plot food sources
         for food in self.food_sources.values():
             plt.scatter(*food.position, color='green', s=100, marker='s')
-
-        # plot water sources
         for water in self.water_sources.values():
             plt.scatter(*water.position, color='blue', s=100, marker='s')
-
-        # plot rabbits
         for creature in self.creatures.values():
             plt.scatter(*creature.position, color='white', s=50)
 
-        plt.title(f"Tick: {self.tick_count} | Population: {len(self.creatures)}", 
-                color='white')
+        plt.title(f"Tick: {self.tick_count} | Population: {len(self.creatures)}",
+                  color='white')
         plt.pause(0.1)
