@@ -96,14 +96,14 @@ class Simulation:
 
         # reload creatures
         for row in db.get_creature_states(tick_id):
-            creature_id, species, sex, age, hunger, thirst, pos_x, pos_y = row
+            creature_id, species, sex, age, food_level, water_level, pos_x, pos_y = row
             if species == "Rabbit":
                 rabbit              = Rabbit((pos_x, pos_y))
                 rabbit.id           = creature_id
                 rabbit.sex          = True if sex == "F" else False
                 rabbit.age          = age
-                rabbit.hunger       = hunger
-                rabbit.thirst       = thirst
+                rabbit.food_level       = food_level
+                rabbit.water_level       = water_level
                 self.add_creature(rabbit)
 
         # reload resources

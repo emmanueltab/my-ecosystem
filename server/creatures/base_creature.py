@@ -4,15 +4,16 @@ import math
 
 class BaseCreature:
     def __init__(self, name, dimension, position, speed, vision_range, 
-                 max_hunger, max_thirst):
+                 food_capacity, water_capacity):
         # Identity
-        self.id           = str(uuid.uuid4())
-        self.name         = name
+        self.id           = str(uuid.uuid4()) 
+        self.name         = name 
         self.dimension    = dimension
         self.alive        = True
         self.age          = 0
 
         # Reproduction
+        # value is hardcoded. same for every creature:
         self.sex                    = self.assign_sex()
         self.reproduction_threshold = 80
         self.reproduction_cooldown  = 0
@@ -25,19 +26,20 @@ class BaseCreature:
         # Vision
         self.vision_range = vision_range
 
-        # Hunger & Thirst
-        self.max_hunger   = max_hunger
-        self.hunger       = max_hunger
-        self.max_thirst   = max_thirst
-        self.thirst       = max_thirst
+        # food_level & water_level
+        # value comes from the parameter. might vary per creature:
+        self.food_capacity   = food_capacity
+        self.food_level       = food_capacity
+        self.water_capacity   = water_capacity
+        self.water_level       = water_capacity
 
     def update(self):
-        """Called every tick. Creatures die if hunger is depleted or low age"""
+        """Called every tick. Creatures die if food_level is depleted or low age"""
         if self.alive:
             self.age    += 1
-            self.hunger -= 1
-            self.thirst -= 2
-            if self.hunger <= 0 or self.thirst <= 0:
+            self.food_level -= 1
+            self.water_level -= 2
+            if self.food_level <= 0 or self.water_level <= 0:
                 self.die()
             if self.max_age is not None and self.age >= self.max_age:
                 self.die()
@@ -90,17 +92,17 @@ class BaseCreature:
         water = [o for o in visible if o.get_type() == "water" and o.has_resource()]
 
         # determine priority based on which stat is lower
-        hunger_percent = self.hunger / self.max_hunger
-        thirst_percent = self.thirst / self.max_thirst
+        hunger_percent = self.food_level / self.food_capacity
+        thirst_percent = self.water_level / self.water_capacity
 
         if hunger_percent < thirst_percent:
-            # hunger is more urgent
+            # food_level is more urgent
             if food:
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
             elif water and thirst_percent < 0.5:
-                # no food visible but thirst is also getting low
+                # no food visible but water_level is also getting low
                 target = min(water, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -108,13 +110,13 @@ class BaseCreature:
                 self.wander(world_width, world_height)
 
         elif thirst_percent < hunger_percent:
-            # thirst is more urgent
+            # water_level is more urgent
             if water:
                 target = min(water, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
             elif food and hunger_percent < 0.5:
-                # no water visible but hunger is also getting low
+                # no water visible but food_level is also getting low
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -140,22 +142,22 @@ class BaseCreature:
         if dist <= self.speed + 1:
             if world_object.get_type() == "food" and world_object.has_resource():
                 amount      = world_object.get_eaten()
-                self.hunger = min(self.hunger + amount, self.max_hunger)
-                print(f"{self.name} ate! Hunger: {self.hunger}")
+                self.food_level = min(self.food_level + amount, self.food_capacity)
+                print(f"{self.name} ate! food_level: {self.food_level}")
             elif world_object.get_type() == "water" and world_object.has_resource():
                 amount      = world_object.get_drunk()
-                self.thirst = min(self.thirst + amount, self.max_thirst)
-                print(f"{self.name} drank! Thirst: {self.thirst}")
+                self.water_level = min(self.water_level + amount, self.water_capacity)
+                print(f"{self.name} drank! water_level: {self.water_level}")
 
     def eat(self, food):
-        """Replenishes hunger from a food source."""
+        """Replenishes food_level from a food source."""
         if self.alive:
-            self.hunger = min(self.hunger + food.energy_value, self.max_hunger)
+            self.food_level = min(self.food_level + food.energy_value, self.food_capacity)
 
     def drink(self, water):
-        """Replenishes thirst from a water source."""
+        """Replenishes water_level from a water source."""
         if self.alive:
-            self.thirst = min(self.thirst + water.thirst_value, self.max_thirst)
+            self.water_level = min(self.water_level + water.thirst_value, self.water_capacity)
 
     def wander(self, world_width, world_height):
         """Randomly changes direction and moves."""
@@ -174,8 +176,8 @@ class BaseCreature:
         """Returns True if creature is able to reproduce."""
         return (self.alive
                 and self.reproduction_cooldown == 0
-                and self.hunger >= self.reproduction_threshold
-                and self.thirst >= self.reproduction_threshold)
+                and self.food_level >= self.reproduction_threshold
+                and self.water_level >= self.reproduction_threshold)
 
     def reproduce(self, nearby_creatures):
         """Override in child class to define reproduction behavior."""
@@ -188,7 +190,7 @@ class BaseCreature:
 
     def __str__(self):
         return (f"{self.name} | Age: {self.age} | "
-                f"Hunger: {self.hunger}/{self.max_hunger} | "
-                f"Thirst: {self.thirst}/{self.max_thirst} | "
+                f"food_level: {self.food_level}/{self.food_capacity} | "
+                f"water_level: {self.water_level}/{self.water_capacity} | "
                 f"Position: ({self.position[0]:.1f}, {self.position[1]:.1f}) | "
                 f"Alive: {self.alive}")

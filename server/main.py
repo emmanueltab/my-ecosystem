@@ -6,7 +6,7 @@ from database import Database
 import random
 
 # ── Configure run here ──────────────────────────────
-RESUME    = True   # set True to resume an existing run
+RESUME    = False # resume an existing run
 RESUME_ID = 1       # run id to resume (check DB Browser)
 # ────────────────────────────────────────────────────
 

@@ -9,8 +9,8 @@ class Rabbit(BaseCreature):
             position     = position,
             speed        = 2,
             vision_range = 10,
-            max_hunger   = 100,
-            max_thirst   = 100,
+            food_capacity   = 100,
+            water_capacity   = 100,
         )
         # rabbit specific properties
         self.max_age               = 200
@@ -31,8 +31,8 @@ class Rabbit(BaseCreature):
                      and c.ready_to_reproduce), None)
 
         if mate and self.ready_to_reproduce:
-            self.hunger               -= 20
-            self.thirst               -= 20
+            self.food_level               -= 20
+            self.water_level               -= 20
             self.reproduction_cooldown = 10
             mate.reproduction_cooldown = 10
             return Rabbit(self.position)
@@ -42,7 +42,7 @@ class Rabbit(BaseCreature):
     def __str__(self):
         sex_label = "F" if self.sex else "M"
         return (f"Rabbit [{sex_label}] | Age: {self.age} | "
-                f"Hunger: {self.hunger}/{self.max_hunger} | "
-                f"Thirst: {self.thirst}/{self.max_thirst} | "
+                f"food_level: {self.food_level}/{self.food_capacity} | "
+                f"water_level: {self.water_level}/{self.water_capacity} | "
                 f"Position: ({self.position[0]:.1f}, {self.position[1]:.1f}) | "
                 f"Alive: {self.alive}")

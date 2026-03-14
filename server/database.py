@@ -43,8 +43,8 @@ class Database:
                 species     TEXT,
                 sex         TEXT,
                 age         INTEGER,
-                hunger      REAL,
-                thirst      REAL,
+                food_level      REAL,
+                water_level      REAL,
                 pos_x       REAL,
                 pos_y       REAL,
                 alive       INTEGER
@@ -101,7 +101,7 @@ class Database:
             sex_label = "F" if creature.sex else "M"
             self.cursor.execute('''
                 INSERT INTO creature_states
-                (tick_id, creature_id, species, sex, age, hunger, thirst, pos_x, pos_y, alive)
+                (tick_id, creature_id, species, sex, age, food_level, water_level, pos_x, pos_y, alive)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 tick_id,
@@ -109,8 +109,8 @@ class Database:
                 creature.name,
                 sex_label,
                 creature.age,
-                creature.hunger,
-                creature.thirst,
+                creature.food_level,
+                creature.water_level,
                 creature.position[0],
                 creature.position[1],
                 1 if creature.alive else 0
@@ -154,7 +154,7 @@ class Database:
         """Returns all alive creature states for a given tick."""
         self.cursor.execute('''
             SELECT creature_id, species, sex, age,
-                   hunger, thirst, pos_x, pos_y
+                   food_level, water_level, pos_x, pos_y
             FROM creature_states
             WHERE tick_id = ? AND alive = 1
         ''', (tick_id,))
