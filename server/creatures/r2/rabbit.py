@@ -40,6 +40,7 @@ class Rabbit(BaseCreature):
         return None
 
     def __str__(self):
+        """descibes what happens when you print a rabbit object"""
         sex_label = "F" if self.sex else "M"
         return (f"Rabbit [{sex_label}] | Age: {self.age} | "
                 f"food_level: {self.food_level}/{self.food_capacity} | "

@@ -1,9 +1,6 @@
 import time
 import random
 import math
-import matplotlib
-matplotlib.use('Qt5Agg')
-import matplotlib.pyplot as plt
 from creatures.r2.rabbit import Rabbit
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
@@ -98,12 +95,12 @@ class Simulation:
         for row in db.get_creature_states(tick_id):
             creature_id, species, sex, age, food_level, water_level, pos_x, pos_y = row
             if species == "Rabbit":
-                rabbit              = Rabbit((pos_x, pos_y))
-                rabbit.id           = creature_id
-                rabbit.sex          = True if sex == "F" else False
-                rabbit.age          = age
-                rabbit.food_level       = food_level
-                rabbit.water_level       = water_level
+                rabbit           = Rabbit((pos_x, pos_y))
+                rabbit.id        = creature_id
+                rabbit.sex       = True if sex == "F" else False
+                rabbit.age       = age
+                rabbit.food_level  = food_level
+                rabbit.water_level = water_level
                 self.add_creature(rabbit)
 
         # reload resources
@@ -123,17 +120,15 @@ class Simulation:
         print(f"Loaded {len(self.creatures)} creatures and "
               f"{len(self.food_sources) + len(self.water_sources)} resources.")
 
-    def run(self, ticks=20):
+    def run(self, ticks=999999):
+        # Runs the simulation loop for a given number of ticks.
+        # Defaults to 999999 so it runs indefinitely in server mode.
         self.running = True
-        plt.ion()
         for _ in range(ticks):
             if not self.running:
                 break
             self.tick()
-            self.visualize()
             time.sleep(0.5)
-        plt.ioff()
-        plt.show()
 
     def pause(self):
         self.running = False
@@ -146,20 +141,5 @@ class Simulation:
         self.running       = False
 
     def visualize(self):
-        plt.clf()
-        ax = plt.gca()
-        ax.set_facecolor('black')
-        plt.gcf().set_facecolor('black')
-        plt.xlim(0, self.world_width)
-        plt.ylim(0, self.world_height)
-
-        for food in self.food_sources.values():
-            plt.scatter(*food.position, color='green', s=100, marker='s')
-        for water in self.water_sources.values():
-            plt.scatter(*water.position, color='blue', s=100, marker='s')
-        for creature in self.creatures.values():
-            plt.scatter(*creature.position, color='white', s=50)
-
-        plt.title(f"Tick: {self.tick_count} | Population: {len(self.creatures)}",
-                  color='white')
-        plt.pause(0.1)
+        # Kept for reference — replaced by Godot in Phase 4
+        pass

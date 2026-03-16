@@ -21,6 +21,7 @@ class BaseCreature:
         # Movement
         self.position     = position
         self.speed        = speed
+        # direction is random when the creature ihe first created
         self.direction    = random.uniform(0, 360)
 
         # Vision
@@ -50,28 +51,31 @@ class BaseCreature:
             angle = math.radians(self.direction)
             dx    = self.speed * math.cos(angle)
             dy    = self.speed * math.sin(angle)
-            x, y  = self.position
+            x, y  = self.position # a tuple
             x    += dx
             y    += dy
 
-            # Bounce off horizontal walls
+            # Bounce off horizontal (x-axis) walls. changes direction.
             if x < 0 or x > world_width:
                 self.direction = 180 - self.direction
                 x = max(0, min(x, world_width))
 
-            # Bounce off vertical walls
+            # Bounce off vertical (y-axis) walls. changes direction.
             if y < 0 or y > world_height:
                 self.direction = 360 - self.direction
                 y = max(0, min(y, world_height))
 
-            self.position = (x, y)
+             # sets new position once calculations are finished
+            self.position = (x, y) 
 
     def move_toward(self, target_position, world_width, world_height):
         """Moves creature toward a target position."""
         tx, ty         = target_position
         x,  y          = self.position
+        # if rabbit at x=10 and food at x= 40, dx = 30
         dx             = tx - x
         dy             = ty - y
+        # atan2 the gap (dy, dx) and finds what angle points the rabbit to the target.
         self.direction = math.degrees(math.atan2(dy, dx))
         self.move(world_width, world_height)
 
@@ -139,11 +143,14 @@ class BaseCreature:
     def interact(self, world_object):
         """Interacts with a world object if close enough."""
         dist = math.dist(self.position, world_object.position)
+        # checks the object type. 
+        # get_type(),  has_resource(), and gets... are defined in base_world_object.py
         if dist <= self.speed + 1:
             if world_object.get_type() == "food" and world_object.has_resource():
                 amount      = world_object.get_eaten()
                 self.food_level = min(self.food_level + amount, self.food_capacity)
                 print(f"{self.name} ate! food_level: {self.food_level}")
+
             elif world_object.get_type() == "water" and world_object.has_resource():
                 amount      = world_object.get_drunk()
                 self.water_level = min(self.water_level + amount, self.water_capacity)
