@@ -12,10 +12,73 @@ import threading
 # Creates the FastAPI application that listens for HTTP requests
 app = FastAPI()
 
+# ── Shared simulation state ──────────────────────────
+# Declared at the top level so FastAPI endpoints can access
+# the simulation object while it runs in the background thread
+sim = None
+
 @app.get("/status")
 def status():
-    # Returns a simple response to confirm the server is online
-    return {"status": "online"}
+    # Returns basic simulation status
+    if sim is None:
+        return {"status": "starting"}
+    return {
+        "status":     "running" if sim.running else "paused",
+        "tick":       sim.tick_count,
+        "population": len(sim.creatures)
+    }
+
+@app.get("/creatures")
+def get_creatures():
+    # Returns the current state of all living creatures
+    if sim is None:
+        return {"error": "Simulation not started yet"}
+    return [
+        {
+            "id":          c.id,
+            "species":     c.name,
+            "sex":         "F" if c.sex else "M",
+            "age":         c.age,
+            "food_level":  c.food_level,
+            "water_level": c.water_level,
+            "position":    c.position,
+            "alive":       c.alive
+        }
+        for c in sim.creatures.values()
+    ]
+
+@app.get("/resources")
+def get_resources():
+    # Returns the current state of all food and water sources
+    if sim is None:
+        return {"error": "Simulation not started yet"}
+    food = [
+        {"id": f.id, "type": "food", "quantity": f.quantity, "position": f.position}
+        for f in sim.food_sources.values()
+    ]
+    water = [
+        {"id": w.id, "type": "water", "quantity": w.quantity, "position": w.position}
+        for w in sim.water_sources.values()
+    ]
+    return food + water
+
+@app.post("/pause")
+def pause():
+    # Pauses the simulation loop
+    if sim is None:
+        return {"error": "Simulation not started yet"}
+    sim.pause()
+    return {"status": "paused"}
+
+@app.post("/resume")
+def resume():
+    # Resumes the simulation loop in a new thread
+    if sim is None:
+        return {"error": "Simulation not started yet"}
+    thread = threading.Thread(target=sim.run)
+    thread.daemon = True
+    thread.start()
+    return {"status": "resumed"}
 
 # ── Configure run here ──────────────────────────────
 RESUME    = True  # set to True to resume an existing run
@@ -26,6 +89,7 @@ def run_simulation():
     # ── Database & simulation setup ──────────────────
     # Created inside the thread so SQLite stays in the
     # same thread it was created in
+    global sim
     db  = Database()
     sim = Simulation(db=db)
 
