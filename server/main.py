@@ -81,7 +81,7 @@ def resume():
     return {"status": "resumed"}
 
 # ── Configure run here ──────────────────────────────
-RESUME    = True  # set to True to resume an existing run
+RESUME    = False  # set to True to resume an existing run
 RESUME_ID = 1     # run id to resume (check DB Browser)
 # ────────────────────────────────────────────────────
 
@@ -100,18 +100,18 @@ def run_simulation():
     else:
         db.start_run(
             name  = "Run 1 — baseline",
-            notes = "20 rabbits, 10 food, 10 water, 100x100 world"
+            notes = "200 rabbits, 10 food, 10 water, 100x100 world"
         )
         # ── Populate the world ───────────────────────
         # Only runs on a fresh run — load_state() handles
         # repopulation when resuming
-        for i in range(20):
+        for i in range(1000):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_creature(Rabbit(position))
-        for i in range(10):
+        for i in range(200):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_food(FoodSource(position))
-        for i in range(10):
+        for i in range(200):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_water(WaterSource(position))
 
