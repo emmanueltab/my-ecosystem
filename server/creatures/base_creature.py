@@ -30,9 +30,9 @@ class BaseCreature:
         # food_level & water_level
         # value comes from the parameter. might vary per creature:
         self.food_capacity   = food_capacity
-        self.food_level       = food_capacity
-        self.water_capacity   = water_capacity
-        self.water_level       = water_capacity
+        self.food_level      = food_capacity
+        self.water_capacity  = water_capacity
+        self.water_level     = water_capacity
 
     def update(self):
         """Called every tick. Creatures die if food_level is depleted or low age"""

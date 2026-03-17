@@ -105,13 +105,13 @@ def run_simulation():
         # ── Populate the world ───────────────────────
         # Only runs on a fresh run — load_state() handles
         # repopulation when resuming
-        for i in range(1000):
+        for i in range(10):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_creature(Rabbit(position))
-        for i in range(200):
+        for i in range(20):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_food(FoodSource(position))
-        for i in range(200):
+        for i in range(20):
             position = (random.uniform(0, 100), random.uniform(0, 100))
             sim.add_water(WaterSource(position))
 
