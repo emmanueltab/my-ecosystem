@@ -1,9 +1,10 @@
 # Ecosystem Simulation & Analytics Platform
 
-![Ecosystem Simulation & Analytics Platform](image.png)
+(github-images/erfdrrks-sprites.png)
 A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is logged to a sqlite database to power live analytics dashboards and for future data science experiments, statistical analysis, and research reports.
 
-shout out to icosco's  "I Made an Evolution Simulator (with silly little guys)"
+inspriration: 
+icosco's  "I Made an Evolution Simulator (with silly little guys)" (part 1)
 https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf
 
 ---
@@ -193,11 +194,11 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 ---
 
 ## 📈 Status and Screenshots: 
-🔧 In development — Phase 4
-
-![terminal: 12 erfdrrkts, 10 water, 10 food](image-1.png)
-
-![from godot: 200 "erfdrrtks", 10 water, 10 food.](image-2.png)
+🔧 Godot  — Phase 4 and switching to websockets
+terminal: 12 erfdrrkts, 10 water, 10 food:
+(github-images/terminal-screenshot.png)
+from godot: 200 "erfdrrtks", 10 water, 10 food.
+(github-images/godot-screenshot.png)
 
 
 
