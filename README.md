@@ -195,9 +195,13 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 
 ## 📈 Status and Screenshots: 
 🔧 Godot  — Phase 4 and switching to websockets
+
 terminal: 12 erfdrrkts, 10 water, 10 food:
+
 ![](github-images/terminal-screenshot.png)
+
 from godot: 200 "erfdrrtks", 10 water, 10 food.
+
 ![](github-images/godot-screenshot.png)
 
 
