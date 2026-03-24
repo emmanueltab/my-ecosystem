@@ -3,6 +3,9 @@
 ![Ecosystem Simulation & Analytics Platform](image.png)
 A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is logged to a sqlite database to power live analytics dashboards and for future data science experiments, statistical analysis, and research reports.
 
+shout out to icosco's  "I Made an Evolution Simulator (with silly little guys)"
+https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf
+
 ---
 
 ## 🌐 Live Demo
@@ -15,7 +18,7 @@ Once live, you will be able to:
 
 ---
 
-## 🔓 Open Source
+## Open Source
 
 This project is free and open source. You are welcome to clone it, run your own simulation locally, modify the rules, introduce new creatures, and experiment with your own ecosystems.
 
@@ -28,7 +31,7 @@ See the **Local Setup** section below to get started.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌──────────────────┐        ┌───────────────────┐
@@ -56,7 +59,7 @@ See the **Local Setup** section below to get started.
 
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 my-ecosystem/
@@ -81,7 +84,7 @@ my-ecosystem/
 
 ---
 
-## 🛠️ Tools & Libraries
+## Tools & Libraries
 
 **Tools:**
 - **Python** — primary programming language
@@ -97,7 +100,7 @@ my-ecosystem/
 
 ---
 
-## 💻 Local Setup
+## Local Setup
 
 **Requirements:**
 - Python 3.11+
@@ -122,7 +125,7 @@ http://localhost:3000
 
 ---
 
-## ☁️ Deployment
+## Deployment
 
 The simulation is designed to run continuously on a server and be accessible from anywhere:
 
@@ -155,7 +158,7 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 
 ---
 
-## 📊 Skills Developed
+## Skills Developed
 
 **Programming**
 - Python OOP (classes, methods, inheritance)
@@ -189,8 +192,14 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 
 ---
 
-## 📈 Status
-🔧 In development — Phase 2
+## 📈 Status and Screenshots: 
+🔧 In development — Phase 4
+
+![terminal: 12 erfdrrkts, 10 water, 10 food](image-1.png)
+
+![from godot: 200 "erfdrrtks", 10 water, 10 food.](image-2.png)
+
+
 
 ---
 
