@@ -1,17 +1,17 @@
-# 🌿 Ecosystem Simulation & Analytics Platform
+# Ecosystem Simulation & Analytics Platform
 
-A continuously running server-based simulation of a living ecosystem populated by autonomous, mathematically-themed entities. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. A built-in creature builder allows new entity types to be designed and dropped into the ecosystem while the simulation is actively running. Creatures are mathematically inspired — exhibiting behaviors such as parametric movement, spiral navigation, exponential reproduction, and vector-based pathfinding. The simulation exists in a dual-dimension environment where 3D creatures navigate freely in XYZ space while 2D creatures are locked to a flat plane, producing unique cross-dimensional interactions and emergent behavior. All simulation data is continuously logged to a database, powering live analytics dashboards and serving as the foundation for ongoing data science experiments, statistical analysis, and research reports.
+![Ecosystem Simulation & Analytics Platform](image.png)
+A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is logged to a sqlite database to power live analytics dashboards and for future data science experiments, statistical analysis, and research reports.
 
 ---
 
 ## 🌐 Live Demo
 
-> 🔗 Coming soon — the simulation will be publicly accessible via browser once deployed.
+> 🔗 Coming soon — my personal simulation will be publicly accessible via browser once deployed. 
 
 Once live, you will be able to:
 - Watch the simulation running in real time from any browser
 - View live population charts and ecosystem analytics
-- No installation required
 
 ---
 
@@ -32,21 +32,25 @@ See the **Local Setup** section below to get started.
 
 ```
 ┌──────────────────┐        ┌───────────────────┐
-│  PYTHON SERVER   │◄──────►│     GODOT 4       │
-│  FastAPI+SQLite  │        │  Visual World     │
+│  PYTHON SERVER   │        │     GODOT 4       │
+│    websockets    |◄──────►│  Visual World     │
 │                  │        │  Agents moving    │
-│  The Brain       │        │  in 2D/3D space   │
+│    The Brain     |        |         +         |
+|     SQLlite      │        │  user interface   │
 └────────┬─────────┘        └───────────────────┘
          │
          ▼
 ┌──────────────────┐
-│  GRAFANA         │
-│  Live Charts     │
-│  Stats & Metrics │
+│    GRAFANA       │       
+│  Live Charts     │ 
+│ Stats & Metrics  |
+|                  |
+|     PANDAS       |
+|   data science   |
 └──────────────────┘
 ```
 
-- **Python Server** — the single source of truth. Runs the simulation, stores all data in SQLite, and exposes API endpoints for control
+- **Python Server** — the main language. Runs the simulation, stores all data in SQLite, and commicates to godot using websockets
 - **Godot 4** — visual client that renders the ecosystem in real time via WebSocket connection to the server
 - **Grafana** — reads directly from the SQLite database and renders live analytics panels accessible from any browser
 
@@ -156,7 +160,6 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 **Programming**
 - Python OOP (classes, methods, inheritance)
 - GDScript (Godot's scripting language)
-- API design and development (FastAPI)
 - Client-server communication (HTTP, JSON, WebSockets)
 
 **Data & Databases**

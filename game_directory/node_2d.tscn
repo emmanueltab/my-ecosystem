@@ -108,5 +108,7 @@ animations = [{
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1512270265]
 texture_filter = 1
+position = Vector2(51, -22)
 sprite_frames = SubResource("SpriteFrames_6f8bd")
 animation = &"idle"
+frame_progress = 0.76158816
