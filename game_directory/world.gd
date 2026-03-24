@@ -1,63 +1,66 @@
 extends Node2D
 
+# ── Preload creature scene ─────────────────────────
 const ErfdrrtksScene = preload("res://erfdrrtks.tscn")
 
-var http_creatures = HTTPRequest.new()
-var http_resources = HTTPRequest.new()
+# ── Variables ─────────────────────────────────────
+var ws : WebSocketPeer = null
 var scale_factor = 8.0
-var timer = Timer.new()
 
-# Track existing creatures and resources by id
 var creature_dots = {}
 var resource_dots = {}
-
-# Track previous positions to determine movement direction
 var previous_positions = {}
 
+# ── Ready ────────────────────────────────────────
 func _ready():
-	add_child(http_creatures)
-	add_child(http_resources)
-	http_creatures.request_completed.connect(_on_creatures_completed)
-	http_resources.request_completed.connect(_on_resources_completed)
-	add_child(timer)
-	timer.wait_time = 0.5
-	timer.timeout.connect(_fetch_all)
-	timer.start()
-	_fetch_all()
+	# Create WebSocket client
+	ws = WebSocketPeer.new()
+	
+	# Connect to FastAPI WebSocket server
+	var err = ws.connect_to_url("ws://localhost:8000/ws")
+	if err != OK:
+		print("WebSocket connection failed:", err)
 
-func _fetch_all():
-	if http_creatures.get_http_client_status() == 0:
-		http_creatures.request("http://localhost:8000/creatures")
-	if http_resources.get_http_client_status() == 0:
-		http_resources.request("http://localhost:8000/resources")
+# ── Poll WebSocket each frame ────────────────────
+func _process(delta):
+	if not ws:
+		return
 
-func _on_creatures_completed(result, response_code, headers, body):
-	var creatures = JSON.parse_string(body.get_string_from_utf8())
+	ws.poll() # Required to process incoming/outgoing packets
 
-	# Track which ids are still alive this tick
+	var state = ws.get_ready_state()
+	if state == WebSocketPeer.STATE_OPEN:
+		# Process all available packets
+		while ws.get_available_packet_count() > 0:
+			var packet = ws.get_packet()
+			var data = JSON.parse_string(packet.get_string_from_utf8())
+			if data.has("creatures"):
+				_update_creatures(data["creatures"])
+			if data.has("resources"):
+				_update_resources(data["resources"])
+
+# ── Update Creatures ─────────────────────────────
+func _update_creatures(creatures):
 	var alive_ids = {}
-	for creature in creatures:
-		alive_ids[creature["id"]] = true
+	for c in creatures:
+		alive_ids[c["id"]] = true
 
-	# Remove instances for creatures no longer in the response
+	# Remove dead creatures
 	for id in creature_dots.keys():
 		if not alive_ids.has(id):
 			creature_dots[id].queue_free()
 			creature_dots.erase(id)
 			previous_positions.erase(id)
 
-	# Update or create instances for current creatures
-	for creature in creatures:
-		var id = creature["id"]
-		var x = creature["position"][0] * scale_factor
-		var y = creature["position"][1] * scale_factor
-		var new_pos = Vector2(x, y)
+	# Update or spawn creatures
+	for c in creatures:
+		var id = c["id"]
+		var new_pos = Vector2(c["position"][0], c["position"][1]) * scale_factor
 
 		if creature_dots.has(id):
 			var old_pos = previous_positions.get(id, new_pos)
 			var dx = new_pos.x - old_pos.x
 
-			# Pick animation based on movement direction
 			if dx > 0.5:
 				creature_dots[id].get_node("AnimatedSprite2D").play("right")
 			elif dx < -0.5:
@@ -67,7 +70,6 @@ func _on_creatures_completed(result, response_code, headers, body):
 
 			creature_dots[id].position = new_pos
 		else:
-			# Spawn a new Erfdrrtks instance
 			var erf = ErfdrrtksScene.instantiate()
 			erf.position = new_pos
 			erf.get_node("AnimatedSprite2D").play("ird")
@@ -76,31 +78,29 @@ func _on_creatures_completed(result, response_code, headers, body):
 
 		previous_positions[id] = new_pos
 
-func _on_resources_completed(result, response_code, headers, body):
-	var resources = JSON.parse_string(body.get_string_from_utf8())
-
-	# Track which ids exist this tick
+# ── Update Resources ─────────────────────────────
+func _update_resources(resources):
 	var current_ids = {}
-	for resource in resources:
-		current_ids[resource["id"]] = true
+	for r in resources:
+		current_ids[r["id"]] = true
 
-	# Remove dots for resources no longer in response
+	# Remove missing resources
 	for id in resource_dots.keys():
 		if not current_ids.has(id):
 			resource_dots[id].queue_free()
 			resource_dots.erase(id)
 
-	# Update or create dots for current resources
-	for resource in resources:
-		var id = resource["id"]
-		var x = resource["position"][0] * scale_factor
-		var y = resource["position"][1] * scale_factor
+	# Update or spawn resources
+	for r in resources:
+		var id = r["id"]
+		var pos = Vector2(r["position"][0], r["position"][1]) * scale_factor
+
 		if resource_dots.has(id):
-			resource_dots[id].position = Vector2(x, y)
+			resource_dots[id].position = pos
 		else:
 			var dot = ColorRect.new()
-			dot.color = Color(0.2, 0.8, 0.2) if resource["type"] == "food" else Color(0.2, 0.4, 1.0)
+			dot.color = Color(0.2, 0.8, 0.2) if r["type"] == "food" else Color(0.2, 0.4, 1.0)
 			dot.size = Vector2(10, 10)
-			dot.position = Vector2(x, y)
+			dot.position = pos
 			add_child(dot)
 			resource_dots[id] = dot
