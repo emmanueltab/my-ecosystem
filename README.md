@@ -1,7 +1,7 @@
 # Ecosystem Simulation & Analytics Platform
 
 ![](github-images/erfdrrks-sprites.png)
-A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is logged to a sqlite database to power live analytics dashboards and for future data science experiments, statistical analysis, and research reports.
+A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is sent to Godot visualizations using websockets and logged to a SQLite database to power live analytics Grafana dashboards and for future data science experiments, statistical analysis, and research reports.
 
 inspriration: 
 icosco's  "I Made an Evolution Simulator (with silly little guys)" (part 1)
@@ -52,6 +52,12 @@ See the **Local Setup** section below to get started.
 |     PANDAS       |
 |   data science   |
 └──────────────────┘
+
+Python → WebSocket → Godot (live visuals)
+Python → SQLite → Grafana (live dashboards)
+Python → SQLite → Pandas (deep analysis, reports)
+
+
 ```
 
 - **Python Server** — the main language. Runs the simulation, stores all data in SQLite, and commicates to godot using websockets
@@ -116,7 +122,7 @@ pip install matplotlib pyqt5 fastapi uvicorn pandas --break-system-packages
 **Run the simulation:**
 ```bash
 cd server
-python main.py
+python3 main.py
 ```
 
 **Access Grafana dashboard:**
