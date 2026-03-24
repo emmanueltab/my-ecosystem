@@ -1,13 +1,18 @@
 extends Node2D
 
+const ErfdrrtksScene = preload("res://erfdrrtks.tscn")
+
 var http_creatures = HTTPRequest.new()
 var http_resources = HTTPRequest.new()
 var scale_factor = 8.0
 var timer = Timer.new()
 
-# Track existing dots by id so we can update instead of recreate
+# Track existing creatures and resources by id
 var creature_dots = {}
 var resource_dots = {}
+
+# Track previous positions to determine movement direction
+var previous_positions = {}
 
 func _ready():
 	add_child(http_creatures)
@@ -28,49 +33,63 @@ func _fetch_all():
 
 func _on_creatures_completed(result, response_code, headers, body):
 	var creatures = JSON.parse_string(body.get_string_from_utf8())
-	
+
 	# Track which ids are still alive this tick
 	var alive_ids = {}
 	for creature in creatures:
 		alive_ids[creature["id"]] = true
-	
-	# Remove dots for creatures that are no longer in the response
+
+	# Remove instances for creatures no longer in the response
 	for id in creature_dots.keys():
 		if not alive_ids.has(id):
 			creature_dots[id].queue_free()
 			creature_dots.erase(id)
-	
-	# Update or create dots for current creatures
+			previous_positions.erase(id)
+
+	# Update or create instances for current creatures
 	for creature in creatures:
 		var id = creature["id"]
 		var x = creature["position"][0] * scale_factor
 		var y = creature["position"][1] * scale_factor
+		var new_pos = Vector2(x, y)
+
 		if creature_dots.has(id):
-			# Just move the existing dot
-			creature_dots[id].position = Vector2(x, y)
+			var old_pos = previous_positions.get(id, new_pos)
+			var dx = new_pos.x - old_pos.x
+
+			# Pick animation based on movement direction
+			if dx > 0.5:
+				creature_dots[id].get_node("AnimatedSprite2D").play("right")
+			elif dx < -0.5:
+				creature_dots[id].get_node("AnimatedSprite2D").play("left")
+			else:
+				creature_dots[id].get_node("AnimatedSprite2D").play("ird")
+
+			creature_dots[id].position = new_pos
 		else:
-			# Create a new dot
-			var dot = ColorRect.new()
-			dot.color = Color.WHITE if creature["sex"] == "F" else Color(0.5, 0.8, 1.0)
-			dot.size = Vector2(6, 6)
-			dot.position = Vector2(x, y)
-			add_child(dot)
-			creature_dots[id] = dot
+			# Spawn a new Erfdrrtks instance
+			var erf = ErfdrrtksScene.instantiate()
+			erf.position = new_pos
+			erf.get_node("AnimatedSprite2D").play("ird")
+			add_child(erf)
+			creature_dots[id] = erf
+
+		previous_positions[id] = new_pos
 
 func _on_resources_completed(result, response_code, headers, body):
 	var resources = JSON.parse_string(body.get_string_from_utf8())
-	
+
 	# Track which ids exist this tick
 	var current_ids = {}
 	for resource in resources:
 		current_ids[resource["id"]] = true
-	
+
 	# Remove dots for resources no longer in response
 	for id in resource_dots.keys():
 		if not current_ids.has(id):
 			resource_dots[id].queue_free()
 			resource_dots.erase(id)
-	
+
 	# Update or create dots for current resources
 	for resource in resources:
 		var id = resource["id"]
