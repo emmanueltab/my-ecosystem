@@ -81,44 +81,54 @@ class Simulation:
             self.db.save_resource_states(tick_id, self.food_sources, self.water_sources)
 
     def load_state(self, db, run_id):
-        """Loads the last saved state of a run."""
+        """Loads the last saved state of a run using dictionary keys."""
         result = db.get_last_tick(run_id)
         if not result:
-            print("No saved state found.")
+            print(f"⚠️ No saved state found for run_id: {run_id}")
             return
 
-        tick_id, tick_number = result
-        self.tick_count      = tick_number
-        print(f"Loading state from tick {tick_number}...")
+        # result is a sqlite3.Row, access by name
+        tick_id = result["id"]
+        self.tick_count = result["tick_number"]
+        print(f"🔄 Resuming from tick {self.tick_count}...")
+
+        # Clear current simulation state to avoid duplicates
+        self.creatures.clear()
+        self.food_sources.clear()
+        self.water_sources.clear()
 
         # reload creatures
         for row in db.get_creature_states(tick_id):
-            creature_id, species, sex, age, food_level, water_level, pos_x, pos_y = row
-            if species == "Rabbit":
-                rabbit           = Rabbit((pos_x, pos_y))
-                rabbit.id        = creature_id
-                rabbit.sex       = True if sex == "F" else False
-                rabbit.age       = age
-                rabbit.food_level  = food_level
-                rabbit.water_level = water_level
+            # row is a dict thanks to the DB update
+            pos = (row["pos_x"], row["pos_y"])
+            
+            if row["species"] == "Rabbit":
+                rabbit = Rabbit(pos)
+                rabbit.id = row["creature_id"]
+                # Convert "F"/"M" or 0/1 back to simulation booleans
+                rabbit.sex = True if row["sex"] == "F" else False
+                rabbit.age = row["age"]
+                rabbit.food_level = row["food_level"]
+                rabbit.water_level = row["water_level"]
+                rabbit.alive = bool(row["alive"])
                 self.add_creature(rabbit)
 
         # reload resources
         for row in db.get_resource_states(tick_id):
-            resource_id, resource_type, quantity, pos_x, pos_y = row
-            if resource_type == "food":
-                food          = FoodSource((pos_x, pos_y))
-                food.id       = resource_id
-                food.quantity = quantity
+            pos = (row["pos_x"], row["pos_y"])
+            
+            if row["resource_type"] == "food":
+                food = FoodSource(pos)
+                food.id = row["resource_id"]
+                food.quantity = row["quantity"]
                 self.add_food(food)
-            elif resource_type == "water":
-                water          = WaterSource((pos_x, pos_y))
-                water.id       = resource_id
-                water.quantity = quantity
+            elif row["resource_type"] == "water":
+                water = WaterSource(pos)
+                water.id = row["resource_id"]
+                water.quantity = row["quantity"]
                 self.add_water(water)
 
-        print(f"Loaded {len(self.creatures)} creatures and "
-              f"{len(self.food_sources) + len(self.water_sources)} resources.")
+        print(f"✅ Resume complete: {len(self.creatures)} creatures restored.")
 
     def run(self, ticks=999999):
         # Runs the simulation loop for a given number of ticks.
