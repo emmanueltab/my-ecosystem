@@ -24,6 +24,9 @@ class BaseCreature:
         # direction is random when the creature ihe first created
         self.direction    = random.uniform(0, 360)
 
+        # NEW: Idle/Wander Logic
+        self.is_idling = False
+        self.idle_timer = 0
         # Vision
         self.vision_range = vision_range
 
@@ -102,6 +105,7 @@ class BaseCreature:
         if hunger_percent < thirst_percent:
             # food_level is more urgent
             if food:
+                self.is_idling = False
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -167,8 +171,23 @@ class BaseCreature:
             self.water_level = min(self.water_level + water.thirst_value, self.water_capacity)
 
     def wander(self, world_width, world_height):
-        """Randomly changes direction and moves."""
-        self.direction = random.uniform(0, 360)
+        """Randomly decides to move or stay still."""
+        # If we are currently idling, count down
+        if self.is_idling:
+            self.idle_timer -= 1
+            if self.idle_timer <= 0:
+                self.is_idling = False
+            return # Don't move while idling!
+
+        # 10% chance to start idling for 2-5 ticks
+        if random.random() < 0.10:
+            self.is_idling = True
+            self.idle_timer = random.randint(2, 5)
+            return
+
+        # Otherwise, move as normal
+        # Suggestion: Only change direction slightly so they don't jitter
+        self.direction += random.uniform(-20, 20) 
         self.move(world_width, world_height)
 
 

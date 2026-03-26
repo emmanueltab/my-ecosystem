@@ -11,9 +11,9 @@ from creatures.r2.water_source import WaterSource
 from database import Database
 
 # ── Configuration ─────────────────
-RESUME = True
-RESUME_ID = 2
-TICK_RATE = 0.050
+RESUME = False
+RESUME_ID = 1
+TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
 sim: Simulation | None = None

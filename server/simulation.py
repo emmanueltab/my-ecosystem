@@ -6,7 +6,7 @@ from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 
 class Simulation:
-    def __init__(self, world_width=50, world_height=50, db=None):
+    def __init__(self, world_width=100, world_height=100, db=None):
         # World boundaries
         self.world_width   = world_width
         self.world_height  = world_height
