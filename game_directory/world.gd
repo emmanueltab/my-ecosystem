@@ -72,7 +72,7 @@ func _update_creatures(creatures_data: Array):
 			erf.position = target_pos 
 			add_child(erf)
 			creature_dots[id] = erf
-			erf.get_node("AnimatedSprite2D").play("ird")
+			erf.get_node("AnimatedSprite2D").play("idle")
 		
 		# Store the target instead of setting position directly
 		creature_targets[id] = target_pos
@@ -91,16 +91,37 @@ func _update_resources(resources_data: Array):
 		current_ids.append(id)
 		var pos = Vector2(r["pos"][0], r["pos"][1]) * scale_factor
 		
+		# 1. CREATE the dot if it doesn't exist
 		if not resource_dots.has(id):
 			var dot = ColorRect.new()
-			dot.size = Vector2(10, 10)
-			dot.color = Color.GREEN if r["type"] == "food" else Color.BLUE
 			add_child(dot)
 			resource_dots[id] = dot
+			
+			# Set colors/initial size once
+			if r["type"] == "food":
+				dot.size = Vector2(10, 10)
+				dot.color = Color.GREEN
+			else:
+				# Initial size for water "Lakes"
+				dot.size = Vector2(40, 40) 
+				dot.color = Color(0.1, 0.3, 0.8, 0.7) # Blue with some transparency
 		
-		# Resources can stay snappy since they don't "walk"
-		resource_dots[id].position = pos
+		# 2. UPDATE the position every tick
+		var dot = resource_dots[id]
+		
+		if r["type"] == "water":
+			# Shrink the lake slightly based on quantity (optional but cool)
+			# Assuming quantity is passed as r["qty"] or r["quantity"]
+			var lake_size = clamp(r.get("qty", 100) * 0.4, 15, 60)
+			dot.size = Vector2(lake_size, lake_size)
+			
+			# OFFSET: Subtract half the size so the center of the lake is on the coordinate
+			dot.position = pos - (dot.size / 2.0)
+		else:
+			# Food stays centered
+			dot.position = pos - Vector2(5, 5)
 
+	# 3. CLEANUP
 	for id in resource_dots.keys():
 		if not id in current_ids:
 			resource_dots[id].queue_free()
