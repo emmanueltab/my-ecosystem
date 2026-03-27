@@ -87,7 +87,7 @@ async def run_simulation():
         for _ in range(50):
             sim.add_food(FoodSource((random.uniform(0, 100), random.uniform(0, 100))))
         # Inside your simulation setup
-        for _ in range(3): # Only 3 substantial lakes for the whole 100x100 map
+        for _ in range(10): # Only 10 substantial lakes for the whole 100x100 map
             x = random.uniform(10, 90) # Keep them slightly away from the absolute edges
             y = random.uniform(10, 90)
             lake = WaterSource((x, y), quantity=1500, replenish_rate=10)

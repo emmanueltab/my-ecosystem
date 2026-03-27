@@ -3,6 +3,10 @@ import random
 import math
 
 class BaseCreature:
+    """
+    https://www.geeksforgeeks.org/python/__init__-in-python/
+    variables in the parameters may vary per creature.
+    those declared with a hard value are univeral."""
     def __init__(self, name, dimension, position, speed, vision_range, 
                  food_capacity, water_capacity):
         # Identity
@@ -41,8 +45,8 @@ class BaseCreature:
         """Called every tick. Creatures die if food_level is depleted or low age"""
         if self.alive:
             self.age    += 1
-            self.food_level -= 1
-            self.water_level -= 2
+            self.food_level -= 0.5
+            self.water_level -= 1
             if self.food_level <= 0 or self.water_level <= 0:
                 self.die()
             if self.max_age is not None and self.age >= self.max_age:
@@ -92,6 +96,14 @@ class BaseCreature:
         return visible
 
     def seek(self, world_objects, world_width, world_height):
+        """
+        Decision Tree: 
+        1. if ready to reproduce, find a mate.
+        2. Otherwise, check if thirst or hunger is more urgent.
+        """
+        # --- 1. PRIORITY: REPRODUCTION ---
+
+        # objects that are within the creatures vision_range. 
         visible = self.look(world_objects)
 
         # separate food and water
@@ -101,6 +113,7 @@ class BaseCreature:
         # determine priority based on which stat is lower
         hunger_percent = self.food_level / self.food_capacity
         thirst_percent = self.water_level / self.water_capacity
+
 
         if hunger_percent < thirst_percent:
             # food_level is more urgent

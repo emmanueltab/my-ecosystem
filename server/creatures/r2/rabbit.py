@@ -13,7 +13,7 @@ class Rabbit(BaseCreature):
             water_capacity   = 100,
         )
         # rabbit specific properties
-        self.max_age               = 200
+        self.max_age               = 400
         self.sex                   = random.choice([True, False])
         self.reproduction_threshold = 80
         self.reproduction_cooldown  = 0
