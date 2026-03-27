@@ -20,6 +20,8 @@ sim: Simulation | None = None
 connected_clients: list[WebSocket] = []
 
 def get_snapshot():
+    """takes snapshot of the simulation and shrinks it into 
+    Dictionary that can be turned into a JSON string and sent over the internet."""
     if sim is None:
         return {}
     creatures = [
@@ -30,6 +32,7 @@ def get_snapshot():
             "age": c.age,
             "food": c.food_level,
             "water": c.water_level,
+            # rounds position to two decimal places to make text shorter (5.234234, 6.45645635) -> (5,23, 6.45)
             "pos": [round(c.position[0], 2), round(c.position[1], 2)],
             "alive": c.alive
         }
@@ -47,10 +50,11 @@ def get_snapshot():
     }
 
 async def broadcast_snapshot():
+    """send snapshot to every Godot instance (client) that is currently listening."""
     if not connected_clients:
         return
-    
-    data = json.dumps(get_snapshot())
+    # translate to string. cant send ditrionaries.
+    data = json.dumps(get_snapshot()) 
     # Iterate on a copy to avoid "list size changed during iteration" errors
     for client in connected_clients[:]:
         try:

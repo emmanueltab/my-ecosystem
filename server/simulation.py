@@ -23,6 +23,7 @@ class Simulation:
         self.tick_count    = 0
         self.running       = False
 
+    # adder functions (creatures, food, and water)
     def add_creature(self, creature):
         self.creatures[creature.id] = creature
 
@@ -32,12 +33,15 @@ class Simulation:
     def add_water(self, water):
         self.water_sources[water.id] = water
 
+    # keep every creature that is alive, and disregard the ones are are not alive:
     def remove_dead(self):
         self.creatures = {
             id: c for id, c in self.creatures.items() if c.alive
         }
 
     def tick(self):
+        """represents one unit of time. This is what occurs in each time unit of the simulation."""
+
         self.tick_count += 1
         print(f"\n--- Tick {self.tick_count} ---")
 
@@ -48,10 +52,10 @@ class Simulation:
         # update all creatures
         for creature in self.creatures.values():
             creature.seek(world_objects, self.world_width, self.world_height)
-            creature.update()
+            creature.update() # get older, lose energy levels, die, etc)
             print(creature)
 
-        # replenish all world objects
+        # replenish all world objects at every tick
         for food in self.food_sources.values():
             food.replenish()
         for water in self.water_sources.values():
@@ -71,10 +75,11 @@ class Simulation:
         for offspring in new_creatures:
             self.add_creature(offspring)
 
+        # last action for the simulaton. Removes dead creatures every tick.
         self.remove_dead()
         print(f"Population: {len(self.creatures)}")
 
-        # save to database if connected
+        # save the dictionaries of ehe state to the database if connected
         if self.db:
             tick_id = self.db.save_tick(self.tick_count, len(self.creatures))
             self.db.save_creature_states(tick_id, self.creatures)
@@ -131,8 +136,8 @@ class Simulation:
         print(f"✅ Resume complete: {len(self.creatures)} creatures restored.")
 
     def run(self, ticks=999999):
-        # Runs the simulation loop for a given number of ticks.
-        # Defaults to 999999 so it runs indefinitely in server mode.
+        """Runs the simulation loop for a given number of ticks.
+        Defaults to 999999 so it runs indefinitely in server mode."""
         self.running = True
         for _ in range(ticks):
             if not self.running:
