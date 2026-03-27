@@ -1,6 +1,51 @@
 [gd_scene format=3 uid="uid://i6lj6718i8cg"]
 
 [ext_resource type="Texture2D" uid="uid://dp65a0idl1b83" path="res://assets/creature animations/erfdrrtks.png" id="1_esbvn"]
+[ext_resource type="Texture2D" uid="uid://diexsilejfle2" path="res://assets/explosions/Free Smoke Fx  Pixel 06.png" id="1_jyru8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6f8bd"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(0, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ve5kg"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(64, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x6hp6"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(128, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dcwow"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(192, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6tswm"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(320, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sltb0"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(256, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p4u3j"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(384, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cbh45"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(448, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_inmsh"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(512, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0edle"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(576, 832, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_js1le"]
+atlas = ExtResource("1_jyru8")
+region = Rect2(640, 832, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jyru8"]
 atlas = ExtResource("1_esbvn")
@@ -52,6 +97,44 @@ region = Rect2(224, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6f8bd"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6f8bd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ve5kg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x6hp6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dcwow")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6tswm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sltb0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p4u3j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cbh45")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_inmsh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0edle")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_js1le")
+}],
+"loop": false,
+"name": &"explode",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jyru8")
@@ -109,4 +192,4 @@ animations = [{
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1512270265]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_6f8bd")
-animation = &"idle"
+animation = &"explode"

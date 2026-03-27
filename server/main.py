@@ -72,7 +72,7 @@ def _sync_save(db: Database, tick_count: int):
     db.save_creature_states(tick_id, sim.creatures)
     db.save_resource_states(tick_id, sim.food_sources, sim.water_sources)
 
-async def run_simulation():
+async def run_simulation():                 
     global sim
     db = Database()
     sim = Simulation(db=db)
@@ -91,7 +91,7 @@ async def run_simulation():
             x = random.uniform(10, 90) # Keep them slightly away from the absolute edges
             y = random.uniform(10, 90)
             lake = WaterSource((x, y), quantity=1500, replenish_rate=10)
-            sim.add_water(lake)
+            sim.add_water(lake)          
 
     print("✅ Simulation Initialized")
 
