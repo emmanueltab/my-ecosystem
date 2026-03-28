@@ -108,7 +108,7 @@ my-ecosystem/
 ---
 
 ## Local Setup
-
+```
 cd server
 # Create the virtual environment
 python3 -m venv venv
@@ -122,10 +122,11 @@ source venv/bin/activate
 # Install core dependencies
 pip install -r requirements.txt
 
-run the program: 
+# run the program: 
 python3 main.py
 
 ```
+---
 
 **Access Grafana dashboard:**
 ```
