@@ -99,7 +99,7 @@ my-ecosystem/
 - **Grafana** — standalone dashboard for real-time monitoring
 
 **Python Libraries:**
-- **FastAPI** — API server
+- **FastAPI** — API server and WebSockets
 - **Uvicorn** — runs the FastAPI server
 - **SQLite3** — database management, built into Python
 - **Pandas** — data analysis and report generation
@@ -109,20 +109,22 @@ my-ecosystem/
 
 ## Local Setup
 
-**Requirements:**
-- Python 3.11+
-- Godot 4
-- Grafana
-
-**Install Python dependencies:**
-```bash
-pip install matplotlib pyqt5 fastapi uvicorn pandas --break-system-packages
-```
-
-**Run the simulation:**
-```bash
 cd server
+# Create the virtual environment
+python3 -m venv venv
+
+# Activate it
+# On Linux/Mac:
+source venv/bin/activate
+# On Windows:
+# .\venv\Scripts\activate
+
+# Install core dependencies
+pip install -r requirements.txt
+
+run the program: 
 python3 main.py
+
 ```
 
 **Access Grafana dashboard:**
