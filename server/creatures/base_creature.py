@@ -17,10 +17,13 @@ class BaseCreature:
         self.age          = 0
 
         # Reproduction
-        # value is hardcoded. same for every creature:
-        self.sex                    = self.assign_sex()
-        self.reproduction_threshold = 80
-        self.reproduction_cooldown  = 0
+        # values are hardcoded now but can be changed later for experiments
+        self.sex                         = self.assign_sex()
+        self.reproduction_threshold      = 80
+        self.reproduction_cooldown       = 0
+        self.reproduction_cooldown_duration = 40
+        self.reproduction_age_threshold  = 20
+        self.mate_target                 = None
 
         # Movement
         self.position     = position
@@ -49,6 +52,8 @@ class BaseCreature:
             self.water_level -= 1
             if self.food_level <= 0 or self.water_level <= 0:
                 self.die()
+            if self.reproduction_cooldown > 0:
+                self.reproduction_cooldown -= 1
             if self.max_age is not None and self.age >= self.max_age:
                 self.die()
 
@@ -90,10 +95,31 @@ class BaseCreature:
         """Scans for objects within vision range."""
         visible = []
         for obj in objects:
+            if obj is self:
+                continue
             dist = math.dist(self.position, obj.position)
             if dist <= self.vision_range:
                 visible.append(obj)
         return visible
+
+    def get_type(self):
+        """Returns the type of this object for world scanning."""
+        return "creature"
+
+    def _is_valid_mate(self, candidate):
+        return (candidate is not None
+                and candidate is not self
+                and isinstance(candidate, self.__class__)
+                and candidate.alive
+                and candidate.sex != self.sex
+                and candidate.ready_to_reproduce
+                and (candidate.mate_target is None or candidate.mate_target is self))
+
+    def clear_mate_target(self):
+        if self.mate_target is not None:
+            if getattr(self.mate_target, "mate_target", None) is self:
+                self.mate_target.mate_target = None
+            self.mate_target = None
 
     def seek(self, world_objects, world_width, world_height):
         """
@@ -101,29 +127,50 @@ class BaseCreature:
         1. if ready to reproduce, find a mate.
         2. Otherwise, check if thirst or hunger is more urgent.
         """
-        # --- 1. PRIORITY: REPRODUCTION ---
-
-        # objects that are within the creatures vision_range. 
         visible = self.look(world_objects)
 
-        # separate food and water
         food  = [o for o in visible if o.get_type() == "food" and o.has_resource()]
         water = [o for o in visible if o.get_type() == "water" and o.has_resource()]
+        creatures = [o for o in visible if getattr(o, "get_type", lambda: None)() == "creature"]
 
-        # determine priority based on which stat is lower
+        if self.mate_target and not self._is_valid_mate(self.mate_target):
+            self.clear_mate_target()
+
+        if self.ready_to_reproduce:
+            partner = self.mate_target
+            if partner is None:
+                candidates = [c for c in creatures
+                              if isinstance(c, self.__class__)
+                              and c.sex != self.sex
+                              and c.alive
+                              and c.ready_to_reproduce
+                              and (c.mate_target is None or c.mate_target is self)]
+                if candidates:
+                    partner = min(candidates, key=lambda o: math.dist(self.position, o.position))
+                    self.mate_target = partner
+                    partner.mate_target = self
+
+            if partner is not None:
+                self.is_idling = False
+                self.move_toward(partner.position, world_width, world_height)
+                return
+
+            # If already ready to reproduce but no partner is visible,
+            # keep searching / wandering instead of refilling resources.
+            self.wander(world_width, world_height)
+            return
+
+        # --- 2. RESOURCE ACQUISITION ---
         hunger_percent = self.food_level / self.food_capacity
         thirst_percent = self.water_level / self.water_capacity
 
-
         if hunger_percent < thirst_percent:
-            # food_level is more urgent
             if food:
                 self.is_idling = False
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
             elif water and thirst_percent < 0.5:
-                # no food visible but water_level is also getting low
                 target = min(water, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -131,13 +178,13 @@ class BaseCreature:
                 self.wander(world_width, world_height)
 
         elif thirst_percent < hunger_percent:
-            # water_level is more urgent
             if water:
+                self.is_idling = False
                 target = min(water, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
             elif food and hunger_percent < 0.5:
-                # no water visible but food_level is also getting low
+                self.is_idling = False
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -145,12 +192,13 @@ class BaseCreature:
                 self.wander(world_width, world_height)
 
         else:
-            # both equal — seek whichever is visible
             if food:
+                self.is_idling = False
                 target = min(food, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
             elif water:
+                self.is_idling = False
                 target = min(water, key=lambda o: math.dist(self.position, o.position))
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
@@ -214,6 +262,7 @@ class BaseCreature:
     def ready_to_reproduce(self):
         """Returns True if creature is able to reproduce."""
         return (self.alive
+                and self.age >= self.reproduction_age_threshold
                 and self.reproduction_cooldown == 0
                 and self.food_level >= self.reproduction_threshold
                 and self.water_level >= self.reproduction_threshold)

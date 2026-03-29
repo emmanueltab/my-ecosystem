@@ -23,18 +23,25 @@ class Rabbit(BaseCreature):
         if not self.sex:
             return None
 
-        # find a nearby ready male
-        mate = next((c for c in nearby_creatures
-                     if isinstance(c, Rabbit)
-                     and c.sex != self.sex
-                     and c.alive
-                     and c.ready_to_reproduce), None)
+        mate = self.mate_target if self._is_valid_mate(self.mate_target) else None
+        if mate is None:
+            mate = next((c for c in nearby_creatures
+                         if isinstance(c, Rabbit)
+                         and c.sex != self.sex
+                         and c.alive
+                         and c.ready_to_reproduce
+                         and (c.mate_target is None or c.mate_target is self)), None)
+            if mate is not None and mate.mate_target is None:
+                self.mate_target = mate
+                mate.mate_target = self
 
-        if mate and self.ready_to_reproduce:
+        if mate and self.ready_to_reproduce and mate.ready_to_reproduce:
             self.food_level               -= 20
             self.water_level               -= 20
-            self.reproduction_cooldown = 10
-            mate.reproduction_cooldown = 10
+            self.reproduction_cooldown = self.reproduction_cooldown_duration
+            mate.reproduction_cooldown = mate.reproduction_cooldown_duration
+            self.clear_mate_target()
+            mate.clear_mate_target()
             return Rabbit(self.position)
 
         return None

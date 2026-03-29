@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5gwaxckit1sd"]
+
+[ext_resource type="Texture2D" uid="uid://bxnjjskve627s" path="res://assets/Sprout Lands - Sprites - Basic pack/Objects/Basic_Grass_Biom_things.png" id="1_gw1ya"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lwwkx"]
+atlas = ExtResource("1_gw1ya")
+region = Rect2(0, 48, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_d60uk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lwwkx")
+}],
+"loop": true,
+"name": &"still",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_d60uk")
+animation = &"still"

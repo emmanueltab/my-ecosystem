@@ -133,7 +133,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"explode",
-"speed": 5.0
+"speed": 7.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -192,4 +192,4 @@ animations = [{
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_6f8bd")
-animation = &"left"
+animation = &"explode"

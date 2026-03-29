@@ -45,9 +45,10 @@ class Simulation:
         self.tick_count += 1
         print(f"\n--- Tick {self.tick_count} ---")
 
-        # combine food and water into one list for seeking
+        # combine food, water, and creatures into one list for seeking
         world_objects = (list(self.food_sources.values()) +
-                         list(self.water_sources.values()))
+                         list(self.water_sources.values()) +
+                         list(self.creatures.values()))
 
         # update all creatures
         for creature in self.creatures.values():

@@ -1,6 +1,7 @@
 extends Node2D
 
 const ErfdrrtksScene = preload("res://erfdrrtks.tscn")
+const FruitBushScene = preload("res://fruit_bush.tscn")
 
 var ws : WebSocketPeer = WebSocketPeer.new()
 var scale_factor = 8.0
@@ -123,15 +124,15 @@ func _update_resources(resources_data: Array):
 		var pos = Vector2(r["pos"][0], r["pos"][1]) * scale_factor
 		
 		if not resource_dots.has(id):
-			var dot = ColorRect.new()
-			add_child(dot)
-			resource_dots[id] = dot
-			
 			if r["type"] == "food":
-				dot.size = Vector2(10, 10)
-				dot.color = Color.GREEN
+				var bush = FruitBushScene.instantiate()
+				add_child(bush)
+				resource_dots[id] = bush
 			else:
-				dot.size = Vector2(40, 40) 
+				var dot = ColorRect.new()
+				add_child(dot)
+				resource_dots[id] = dot
+				dot.size = Vector2(40, 40)
 				dot.color = Color(0.1, 0.3, 0.8, 0.7)
 		
 		var dot = resource_dots[id]
