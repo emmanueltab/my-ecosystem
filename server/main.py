@@ -1,3 +1,10 @@
+"""Server launcher for the ecosystem simulation.
+
+This module starts a FastAPI application, creates and runs the simulation
+loop as a background task, and broadcasts snapshots to connected Godot
+clients over WebSockets.
+"""
+
 import random
 import json
 import asyncio
@@ -15,6 +22,10 @@ RESUME = False
 RESUME_ID = 1
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
+
+NUMBEROFCREATURES = 50
+NUMBEROFFOOD = 25
+NUMBEROFWATER = 13
 
 sim: Simulation | None = None
 connected_clients: list[WebSocket] = []
@@ -63,6 +74,7 @@ async def broadcast_snapshot():
             connected_clients.remove(client)
 
 async def save_to_db(db: Database, tick_count: int):
+    """Save the current simulation state to the database in a non-blocking way."""
     # Offload DB blocking calls to a thread if your DB driver is synchronous
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, lambda: _sync_save(db, tick_count))
@@ -73,6 +85,7 @@ def _sync_save(db: Database, tick_count: int):
     db.save_resource_states(tick_id, sim.food_sources, sim.water_sources)
 
 async def run_simulation():                 
+    """Initialize the simulation, then run the continuous async main loop."""
     global sim
     db = Database()
     sim = Simulation(db=db)
@@ -82,12 +95,12 @@ async def run_simulation():
         sim.load_state(db, RESUME_ID)
     else:
         db.start_run(f"Run {RESUME_ID}", "Baseline simulation")
-        for _ in range(50):
+        for _ in range(NUMBEROFCREATURES):
             sim.add_creature(Rabbit((random.uniform(0, 100), random.uniform(0, 100))))
-        for _ in range(25):
+        for _ in range(NUMBEROFFOOD):
             sim.add_food(FoodSource((random.uniform(0, 100), random.uniform(0, 100))))
         # Inside your simulation setup
-        for _ in range(13): # Only 10 substantial lakes for the whole 100x100 map
+        for _ in range(NUMBEROFWATER): # Only 10 substantial lakes for the whole 100x100 map
             x = random.uniform(10, 90) # Keep them slightly away from the absolute edges
             y = random.uniform(10, 90)
             lake = WaterSource((x, y), quantity=1500, replenish_rate=10)
@@ -108,14 +121,14 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    sim_task = asyncio.create_task(run_simulation())
-    yield
+    """Start the simulation when the FastAPI app launches and cancel it at shutdown."""
     sim_task.cancel()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan) 
 
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
+    """Accept WebSocket clients and keep them connected for live snapshots."""
     await ws.accept()
     connected_clients.append(ws)
     try:
@@ -126,4 +139,5 @@ async def websocket_endpoint(ws: WebSocket):
             connected_clients.remove(ws)
 
 if __name__ == "__main__":
+    """Run the FastAPI application directly when the module is executed."""
     uvicorn.run(app, host="0.0.0.0", port=8000)
