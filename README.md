@@ -203,7 +203,7 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 ---
 
 ## 📈 Status and Screenshots: 
-🔧 Godot  — Phase 4 and switching to websockets
+🔧 Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
 
 terminal: 12 erfdrrkts, 10 water, 10 food:
 

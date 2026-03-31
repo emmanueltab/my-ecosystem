@@ -18,12 +18,12 @@ from creatures.r2.water_source import WaterSource
 from database import Database
 
 # ── Configuration ─────────────────
-RESUME = False
+RESUME = True
 RESUME_ID = 1
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
-NUMBEROFCREATURES = 50
+NUMBEROFCREATURES = 70
 NUMBEROFFOOD = 25
 NUMBEROFWATER = 13
 
@@ -122,6 +122,8 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start the simulation when the FastAPI app launches and cancel it at shutdown."""
+    sim_task = asyncio.create_task(run_simulation())
+    yield
     sim_task.cancel()
 
 app = FastAPI(lifespan=lifespan) 
