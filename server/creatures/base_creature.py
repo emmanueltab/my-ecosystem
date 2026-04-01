@@ -205,6 +205,18 @@ class BaseCreature:
             else:
                 self.wander(world_width, world_height)
 
+    def carnivore_seek(self, world_objects, world_width, world_height):
+        """
+        IN PROGRESS
+        
+        Alternative seek method for carnivorous creatures that hunt other creatures instead of food/water sources.
+        Decision Tree:
+        1. If ready to reproduce, find a mate (same as herbivores).
+        2. Otherwise, look for prey creatures within vision range and pursue the closest one.
+        3. If no prey is visible, wander randomly.
+        """
+        return None
+
     def interact(self, world_object):
         """Interacts with a world object if close enough."""
         dist = math.dist(self.position, world_object.position)

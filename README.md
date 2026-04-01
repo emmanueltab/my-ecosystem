@@ -109,8 +109,8 @@ my-ecosystem/
 
 ## Local Setup
 ```
-cd server
 # Create the virtual environment
+cd server
 python3 -m venv venv
 
 # Activate it
@@ -205,11 +205,11 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 ## 📈 Status and Screenshots: 
 🔧 Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
 
-terminal: 12 erfdrrkts, 10 water, 10 food:
+terminal: 12 erfs, 10 water, 10 food:
 
 ![](github-images/terminal-screenshot.png)
 
-from godot: 200 "erfdrrtks", 10 water, 10 food.
+from godot: 200 "erfs", 10 water, 10 food.
 
 ![](github-images/godot-screenshot.png)
 

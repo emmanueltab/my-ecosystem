@@ -23,6 +23,9 @@ class Simulation:
         self.tick_count    = 0
         self.running       = False
 
+        
+        self.avaliable_creatures = ["erf", "glooper"]
+
     # adder functions (creatures, food, and water)
     def add_creature(self, creature):
         self.creatures[creature.id] = creature

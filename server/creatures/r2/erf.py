@@ -28,7 +28,7 @@ class erf(BaseCreature):
 
     @property
     def ready_to_reproduce(self):
-        """Female rabbits cannot reproduce while pregnant."""
+        """Female erf cannot reproduce while pregnant."""
         if self.sex and self.pregnant:
             return False
         return (self.alive
@@ -42,7 +42,7 @@ class erf(BaseCreature):
         if not self.alive:
             return
 
-        # Gestating rabbits burn slightly more food/water
+        # Gestating erf burn slightly more food/water
         if self.pregnant:
             self.food_level -= 0.25
             self.water_level -= 0.25
