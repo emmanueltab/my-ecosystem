@@ -1,3 +1,4 @@
+# --- Web Server & API ---
 fastapi==0.135.1
 uvicorn[standard]==0.42.0
 websockets==10.4
@@ -8,3 +9,10 @@ anyio==4.12.1
 h11==0.16.0
 idna==3.6
 typing_extensions==4.15.0
+
+# --- Data Analysis & Visualization ---
+pandas>=2.2.0
+matplotlib>=3.8.0
+numpy>=1.26.0
+jupyter>=1.0.0
+ipykernel>=6.0.0

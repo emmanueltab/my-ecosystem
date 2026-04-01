@@ -1,7 +1,7 @@
 import time
 import random
 import math
-from creatures.r2.rabbit import Rabbit
+from creatures.r2.erf import erf
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 
@@ -108,16 +108,16 @@ class Simulation:
             # row is a dict thanks to the DB update
             pos = (row["pos_x"], row["pos_y"])
             
-            if row["species"] == "Rabbit":
-                rabbit = Rabbit(pos)
-                rabbit.id = row["creature_id"]
+            if row["species"] == "erf":
+                erf = erf(pos)
+                erf.id = row["creature_id"]
                 # Convert "F"/"M" or 0/1 back to simulation booleans
-                rabbit.sex = True if row["sex"] == "F" else False
-                rabbit.age = row["age"]
-                rabbit.food_level = row["food_level"]
-                rabbit.water_level = row["water_level"]
-                rabbit.alive = bool(row["alive"])
-                self.add_creature(rabbit)
+                erf.sex = True if row["sex"] == "F" else False
+                erf.age = row["age"]
+                erf.food_level = row["food_level"]
+                erf.water_level = row["water_level"]
+                erf.alive = bool(row["alive"])
+                self.add_creature(erf)
 
         # reload resources
         for row in db.get_resource_states(tick_id):

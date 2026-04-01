@@ -12,20 +12,46 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import uvicorn
 
 from simulation import Simulation
-from creatures.r2.rabbit import Rabbit
+from creatures.r2.erf import erf
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 from database import Database
 
 # ── Configuration ─────────────────
 RESUME = True
-RESUME_ID = 1
+RESUME_ID = 3
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
-NUMBEROFCREATURES = 70
-NUMBEROFFOOD = 25
-NUMBEROFWATER = 13
+NUMBER_OF_CREATURES = 200
+NUMBER_OF_FOOD = 25
+NUMBER_OF_WATER = 10
+
+# Predefined positions for food and water sources to ensure they are not randomly placed every time, which can help with testing and consistency. If you want them to be random, you can remove these lists and generate random positions in the loop.
+positions_of_food = [(20, 20), (80, 20), (20, 80), (80, 80), (50, 50), (30, 70), (70, 30), (60, 60), (40, 40), (25, 75), (75, 25), (55, 55), (45, 45), (35, 65), (65, 35), (15, 85), (85, 15), (10, 90), (90, 10), (50, 30), (30, 50), (70, 70), (70, 50), (50, 70)]
+positions_of_water = [(30, 30), (70, 30), (30, 70), (70, 70), (50, 20), (20, 50), (80, 50), (50, 80), (40, 60), (60, 40)]
+
+# if there are more food sources than predefined positions, generate random positions for the remaining food sources
+if NUMBER_OF_FOOD > len(positions_of_food):
+    pos_needed = NUMBER_OF_FOOD - len(positions_of_food)
+    for _ in range(pos_needed):
+        positions_of_food.append((random.uniform(0, 100), random.uniform(0, 100)))
+
+elif NUMBER_OF_FOOD < len(positions_of_food):
+    positions_of_food = positions_of_food[:NUMBER_OF_FOOD]
+else:
+    pass
+
+# if there are more water sources than predefined positions, generate random positions for the remaining water sources and vice versa.
+if NUMBER_OF_WATER > len(positions_of_water):
+    pos_needed = NUMBER_OF_WATER - len(positions_of_water)
+    for _ in range(pos_needed):
+        positions_of_water.append((random.uniform(0, 100), random.uniform(0, 100)))
+
+elif NUMBER_OF_WATER < len(positions_of_water):
+    positions_of_water = positions_of_water[:NUMBER_OF_WATER]
+else:
+    pass
 
 sim: Simulation | None = None
 connected_clients: list[WebSocket] = []
@@ -95,16 +121,20 @@ async def run_simulation():
         sim.load_state(db, RESUME_ID)
     else:
         db.start_run(f"Run {RESUME_ID}", "Baseline simulation")
-        for _ in range(NUMBEROFCREATURES):
-            sim.add_creature(Rabbit((random.uniform(0, 100), random.uniform(0, 100))))
-        for _ in range(NUMBEROFFOOD):
-            sim.add_food(FoodSource((random.uniform(0, 100), random.uniform(0, 100))))
-        # Inside your simulation setup
-        for _ in range(NUMBEROFWATER): # Only 10 substantial lakes for the whole 100x100 map
-            x = random.uniform(10, 90) # Keep them slightly away from the absolute edges
-            y = random.uniform(10, 90)
-            lake = WaterSource((x, y), quantity=1500, replenish_rate=10)
-            sim.add_water(lake)          
+
+        # adds creatures and resources to the simulation. If resuming, they will be loaded from the database instead.
+        # if there is not a set position for a resource, then it will be placed in a random position. This is to ensure that the simulation is not always the same and to add some variability.
+
+        for _ in range(NUMBER_OF_CREATURES):
+            sim.add_creature(erf((random.uniform(0, 100), random.uniform(0, 100))))
+        
+        # Use each predefined food position once, or from randomly generated positions
+        for pos in positions_of_food:
+            sim.add_food(FoodSource(pos))
+
+        # Use each predefined water position once
+        for pos in positions_of_water:
+            sim.add_water(WaterSource(pos, quantity=1500, replenish_rate=10))
 
     print("✅ Simulation Initialized")
 

@@ -84,10 +84,10 @@ class BaseCreature:
         """Moves creature toward a target position."""
         tx, ty         = target_position
         x,  y          = self.position
-        # if rabbit at x=10 and food at x= 40, dx = 30
+        # if erf at x=10 and food at x= 40, dx = 30
         dx             = tx - x
         dy             = ty - y
-        # atan2 the gap (dy, dx) and finds what angle points the rabbit to the target.
+        # atan2 the gap (dy, dx) and finds what angle points the erf to the target.
         self.direction = math.degrees(math.atan2(dy, dx))
         self.move(world_width, world_height)
 
