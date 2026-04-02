@@ -9,7 +9,7 @@ https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf
 
 ---
 
-## 🌐 Live Demo
+## Live Demo
 
 > 🔗 Coming soon — my personal simulation will be publicly accessible via browser once deployed. 
 
