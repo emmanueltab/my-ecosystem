@@ -152,7 +152,7 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 
 ---
 
-## 🚀 Build Phases
+## Build Phases
 
 | Phase | What Gets Built | Difficulty | Est. Time |
 |-------|----------------|------------|-----------|
@@ -203,7 +203,7 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 ---
 
 ## 📈 Status and Screenshots: 
-🔧 Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
+Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
 
 Terminal: 12 erfs, 10 water, 10 food:
 
@@ -220,5 +220,5 @@ A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water 
 
 ---
 
-## 📄 License
+## License
 MIT License — free to use, modify, and distribute.
