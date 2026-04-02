@@ -213,6 +213,9 @@ from godot: 200 "erfs", 10 water, 10 food.
 
 ![](github-images/godot-screenshot.png)
 
+a graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed accross the world:
+
+![](github-images/graph1.png)
 
 
 ---
