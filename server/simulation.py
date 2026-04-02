@@ -112,15 +112,15 @@ class Simulation:
             pos = (row["pos_x"], row["pos_y"])
             
             if row["species"] == "erf":
-                erf = erf(pos)
-                erf.id = row["creature_id"]
+                creature = erf(pos)
+                creature.id = row["creature_id"]
                 # Convert "F"/"M" or 0/1 back to simulation booleans
-                erf.sex = True if row["sex"] == "F" else False
-                erf.age = row["age"]
-                erf.food_level = row["food_level"]
-                erf.water_level = row["water_level"]
-                erf.alive = bool(row["alive"])
-                self.add_creature(erf)
+                creature.sex = True if row["sex"] == "F" else False
+                creature.age = row["age"]
+                creature.food_level = row["food_level"]
+                creature.water_level = row["water_level"]
+                creature.alive = bool(row["alive"])
+                self.add_creature(creature)
 
         # reload resources
         for row in db.get_resource_states(tick_id):
