@@ -205,15 +205,15 @@ Once deployed, the simulation runs 24/7 in the background. Check in on it from a
 ## 📈 Status and Screenshots: 
 🔧 Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
 
-terminal: 12 erfs, 10 water, 10 food:
+Terminal: 12 erfs, 10 water, 10 food:
 
 ![](github-images/terminal-screenshot.png)
 
-from godot: 200 "erfs", 10 water, 10 food.
+From godot: 200 "erfs", 10 water, 10 food.
 
 ![](github-images/godot-screenshot.png)
 
-a graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed accross the world:
+A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
 
 ![](github-images/graph1.png)
 
