@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: ecosystem-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      # This line maps your database folder so the container can see it
+      - ./server/data:/home/grafana/data:ro 
+    restart: unless-stopped
+
+volumes:
+  grafana-storage:
