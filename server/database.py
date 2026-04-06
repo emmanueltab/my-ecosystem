@@ -12,15 +12,23 @@ class Database:
             os.makedirs(dir_name, exist_ok=True)
             
         self.db_path = db_path
-        self.connection = sqlite3.connect(db_path, check_same_thread=False)
+        # Added timeout=30 to handle busy database files without crashing
+        self.connection = sqlite3.connect(db_path, check_same_thread=False, timeout=30)
         
-        # Row factory allows us to access columns by name: row["species"]
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
+
+        # --- WAL MODE & PERFORMANCE SETTINGS ---
+        # 1. WAL mode allows concurrent reads and writes (Grafana + Simulation)
+        self.cursor.execute("PRAGMA journal_mode=WAL;")
+        # 2. NORMAL synchronous is faster and perfectly safe for WAL mode
+        self.cursor.execute("PRAGMA synchronous=NORMAL;")
+        # 3. Cache size increase (optional, uses ~20MB RAM to speed up queries)
+        self.cursor.execute("PRAGMA cache_size=-20000;")
         
         self.current_run_id = None
         self.create_tables()
-        print(f"Database connected: {db_path}")
+        print(f"Database connected: {db_path} (WAL Mode Enabled)")
 
     def create_tables(self):
         self.cursor.executescript('''
