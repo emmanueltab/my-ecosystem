@@ -171,8 +171,11 @@ From godot: 200 "erfs", 10 water, 10 food.
 A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
 
 
-![](github-images/graph1.png)
+![](github-images/populationgraph.png)
 
+A graph showing the population of males vs females over ticks. Same configuration.
+
+![](github-images/malesvsfemales.png)
 --- 
 ## License
 
