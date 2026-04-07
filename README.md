@@ -53,7 +53,7 @@ Python → SQLite → Pandas/Jupyter (Deep research & custom analysis)
 
   - **Python Server** — The main engine. Runs the simulation math, stores data in SQLite (WAL mode), and communicates via WebSockets.
   - **Godot 4** — Visual client that renders thousands of agents using **MultiMeshInstance2D**. Includes a transparent "F3-style" overlay for live stats.
-  - **Analytics Engine** — A Python suite that reads the SQLite database to generate a "Standard 10" set of visual reports and plots.
+  - **Analytics Engine** — A Python suite that reads the SQLite database to generate a set of visual reports and plots.
 
 -----
 
@@ -151,20 +151,22 @@ The simulation is designed to run 24/7 on a server:
 
 -----
 
- ## creenshots:
+ ## Screenshots:
 
 Terminal: 12 erfs, 10 water, 10 food:
+
 ![](github-images/terminal-screenshot.png)
 
+From godot: 200 "erfs", 10 water, 10 food:
 
-From godot: 200 "erfs", 10 water, 10 food.
 ![](github-images/godot-screenshot.png)
 
-
 A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
+
 ![](github-images/populationgraph.png)
 
 A graph showing the population of males vs females over ticks. Same configuration.
+
 ![](github-images/malesvsfemales.png)
 
 -----
