@@ -19,13 +19,13 @@ from database import Database
 
 # ── Configuration ─────────────────
 RESUME = True
-RESUME_ID = 4
+RESUME_ID = 1
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
-NUMBER_OF_CREATURES = 100
-NUMBER_OF_FOOD = 50
-NUMBER_OF_WATER = 50
+NUMBER_OF_CREATURES = 200
+NUMBER_OF_FOOD = 100
+NUMBER_OF_WATER = 100
 
 # Predefined positions for food and water sources to ensure they are not randomly placed every time, which can help with testing and consistency. If you want them to be random, you can remove these lists and generate random positions in the loop.
 positions_of_food = [(20, 20), (80, 20), (20, 80), (80, 80), (50, 50), (30, 70), (70, 30), (60, 60), (40, 40), (25, 75), (75, 25), (55, 55), (45, 45), (35, 65), (65, 35), (15, 85), (85, 15), (10, 90), (90, 10), (50, 30), (30, 50), (70, 70), (70, 50), (50, 70)]
