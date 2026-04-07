@@ -1,5 +1,6 @@
 # Ecosystem Simulation & Analytics Platform
 
+ ![](github-images/erfdrrks-sprites.png) 
 A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time via a CLI — run, paused, reset, and configured to adjust environmental settings. All simulation data is sent to Godot for high-performance visualization using WebSockets and logged to a SQLite database. Live telemetry is displayed directly within the Godot scene, while deep data science experiments and research reports are generated via Python scripts and Jupyter Notebooks.
 
 **Inspiration:** icosco's "I Made an Evolution Simulator (with silly little guys)" (part 1)
@@ -150,6 +151,29 @@ The simulation is designed to run 24/7 on a server:
 
 -----
 
+ ## 📈 Status and Screenshots:
+
+optimizing the database. simulation stops running after many ticks. figure out how the final product will look like when done.
+
+
+Terminal: 12 erfs, 10 water, 10 food:
+
+
+![](github-images/terminal-screenshot.png)
+
+
+From godot: 200 "erfs", 10 water, 10 food.
+
+
+![](github-images/godot-screenshot.png)
+
+
+A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
+
+
+![](github-images/graph1.png)
+
+--- 
 ## License
 
 MIT License — free to use, modify, and distribute.
