@@ -1,36 +1,28 @@
 # Ecosystem Simulation & Analytics Platform
 
-![](github-images/erfdrrks-sprites.png)
-A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time — run, paused, reset, and configured to adjust environmental settings or introduce new objects and entities at any time. All simulation data is sent to Godot for visualizations using websockets and logged to a SQLite database to power live analytics Grafana dashboards and for future data science experiments, statistical analysis, and research reports. The simulation can be monitored from any device via the web.
+A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time via a CLI — run, paused, reset, and configured to adjust environmental settings. All simulation data is sent to Godot for high-performance visualization using WebSockets and logged to a SQLite database. Live telemetry is displayed directly within the Godot scene, while deep data science experiments and research reports are generated via Python scripts and Jupyter Notebooks.
 
-inspriration: 
-icosco's  "I Made an Evolution Simulator (with silly little guys)" (part 1)
-https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf
+**Inspiration:** icosco's "I Made an Evolution Simulator (with silly little guys)" (part 1)
+[https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf](https://youtu.be/f7vH2Li9KOw?si=tzwzBUNQQldcVpnf)
 
----
+-----
 
 ## Live Demo
 
-> 🔗 Coming soon — my personal simulation will be publicly accessible via browser once deployed. 
+> 🔗 Coming soon — my personal simulation will be publicly accessible via browser once deployed.
 
 Once live, you will be able to:
-- Watch the simulation running in real time from any browser
-- View live population charts and ecosystem analytics
 
----
+  - Watch the simulation running in real time from any browser.
+  - View live population stats and ecosystem vitals via the integrated Godot HUD.
+
+-----
 
 ## Open Source
 
-This project is free and open source. You are welcome to clone it, run your own simulation locally, modify the rules, introduce new creatures, and experiment with your own ecosystems.
+This project is free and open source. You are welcome to clone it, run your own simulation locally, modify the rules, and experiment with your own ecosystems.
 
-```bash
-git clone https://github.com/emmanueltab/my-ecosystem.git
-cd my-ecosystem
-```
-
-See the **Local Setup** section below to get started.
-
----
+-----
 
 ## Architecture
 
@@ -38,187 +30,125 @@ See the **Local Setup** section below to get started.
 ┌──────────────────┐        ┌───────────────────┐
 │  PYTHON SERVER   │        │     GODOT 4       │
 │    websockets    |◄──────►│  Visual World     │
-│                  │        │  Agents moving    │
+│                  │        │ (MultiMesh Render)│
 │    The Brain     |        |         +         |
-|     SQLlite      │        │  user interface   │
+|     SQLlite      │        │   Live HUD Stats  │
 └────────┬─────────┘        └───────────────────┘
          │
          ▼
 ┌──────────────────┐
-│    GRAFANA       │       
-│  Live Charts     │ 
-│ Stats & Metrics  |
+│ ANALYTICS ENGINE │       
+│  Standard 10     │ 
+│  PNG Reports     |
 |                  |
 |     PANDAS       |
-|   data science   |
+|  Jupyter Custom  |
 └──────────────────┘
 
-Python → WebSocket → Godot (live visuals)
-Python → SQLite → Grafana (live dashboards)
-Python → SQLite → Pandas (deep analysis, reports)
-
-
+Python → WebSocket → Godot (Live visuals + HUD Telemetry)
+Python → SQLite → Matplotlib (Automated PNG reports)
+Python → SQLite → Pandas/Jupyter (Deep research & custom analysis)
 ```
 
-- **Python Server** — the main language. Runs the simulation, stores all data in SQLite, and commicates to godot using websockets
-- **Godot 4** — visual client that renders the ecosystem in real time via WebSocket connection to the server
-- **Grafana** — reads directly from the SQLite database and renders live analytics panels accessible from any browser
+  - **Python Server** — The main engine. Runs the simulation math, stores data in SQLite (WAL mode), and communicates via WebSockets.
+  - **Godot 4** — Visual client that renders thousands of agents using **MultiMeshInstance2D**. Includes a transparent "F3-style" overlay for live stats.
+  - **Analytics Engine** — A Python suite that reads the SQLite database to generate a "Standard 10" set of visual reports and plots.
 
----
+-----
 
 ## Repository Structure
 
 ```
 my-ecosystem/
-├── server/              # Python simulation engine and API
+├── manager.py           # CLI Controller (create, resume, report)
+├── server/              # Python simulation engine and logic
 │   ├── main.py
 │   ├── simulation.py
 │   ├── database.py
-│   ├── creatures/
-│   │   ├── base_creature.py
-│   │   ├── base_world_object.py
-│   │   ├── r1/               # 1D creatures
-│   │   ├── r2/               # 2D creatures
-│   │   └── r3/               # 3D creatures
 │   └── data/
-│       └── ecosystem.db      # SQLite database
-├── game_directory/      # Godot 4 visual world
-├── dashboard/           # Grafana configuration
-├── reports/             # Data analysis and experiment findings
+│       └── ecosystem.db  # SQLite database
+├── game_directory/      # Godot 4 project (MultiMesh + HUD)
+├── reports/             # Automated PNG/PDF analytical charts
+├── analysis.ipynb       # Jupyter Notebook for custom data science
 ├── README.md
 └── .gitignore
 ```
 
----
+-----
 
 ## Tools & Libraries
 
 **Tools:**
-- **Python** — primary programming language
-- **Godot 4** — game engine for the visual ecosystem
-- **Grafana** — standalone dashboard for real-time monitoring
+
+  - **Python** — Primary programming language.
+  - **Godot 4** — Game engine for the visual ecosystem and live UI.
+  - **SQLite3** — Database management (built into Python).
 
 **Python Libraries:**
-- **FastAPI** — API server and WebSockets
-- **Uvicorn** — runs the FastAPI server
-- **SQLite3** — database management, built into Python
-- **Pandas** — data analysis and report generation
-- **Matplotlib** — generating charts and visualizations
 
----
+  - **FastAPI / WebSockets** — Real-time data streaming to Godot.
+  - **Pandas** — Data manipulation and statistical analysis.
+  - **Matplotlib / Seaborn** — Generating high-resolution research reports.
+
+-----
 
 ## Local Setup
-```
+
+```bash
+# clone the repo
+git clone https://github.com/emmanueltab/my-ecosystem.git
+cd my-ecosystem
+
 # Create the virtual environment
-cd server
 python3 -m venv venv
 
-# Activate it
-# On Linux/Mac:
+# Activate it (Linux/Mac)
 source venv/bin/activate
-# On Windows:
-# .\venv\Scripts\activate
+# On Windows: .\venv\Scripts\activate
 
-# Install core dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# run the program: 
-python3 main.py
-
-```
----
-
-**Access Grafana dashboard:**
-```
-http://localhost:3000
+# Run the manager
+python3 manager.py
 ```
 
----
+-----
 
 ## Deployment
 
-The simulation is designed to run continuously on a server and be accessible from anywhere:
+The simulation is designed to run 24/7 on a server:
 
-- **Grafana dashboard** — accessible from any browser on the network
-- **Godot visual world** — exported as a web app, viewable in any browser
-- **FastAPI** — exposes control endpoints accessible via browser or SSH
+  - **Godot visual world** — Exported as a web app (Wasm), viewable in any browser with integrated live stats.
+  - **CLI Management** — Control the simulation remotely via SSH.
+  - **Report Generation** — Generate and download PNG analytics from the server at any time.
 
-**Recommended hosting:**
-- Oracle Cloud (permanently free tier)
-- DigitalOcean (~$4/month)
-- Any Linux VPS
-
-Once deployed, the simulation runs 24/7 in the background. Check in on it from anywhere throughout the week.
-
----
+-----
 
 ## Build Phases
 
 | Phase | What Gets Built | Difficulty | Est. Time |
 |-------|----------------|------------|-----------|
 | 1 | Python simulation engine | ⭐⭐ Medium | 1-2 weeks |
-| 2 | SQLite persistence | ⭐ Easy | 2-3 days |
-| 3 | FastAPI server | ⭐⭐ Medium | 1 week |
-| 4 | Godot visual world | ⭐⭐⭐ Hard | 2-4 weeks |
-| 5 | Grafana dashboard | ⭐⭐ Medium | 3-5 days |
+| 2 | SQLite persistence (WAL Mode) | ⭐ Easy | 2-3 days |
+| 3 | Godot MultiMesh Visuals | ⭐⭐⭐ Hard | 2 weeks |
+| 4 | Integrated Godot HUD | ⭐ Easy | 3-5 days |
+| 5 | Automated Report Scripts | ⭐⭐ Medium | 1 week |
 | 6 | Cloud deployment | ⭐⭐ Medium | 3-5 days |
-| 7 | Data analysis & reports | ⭐⭐ Medium | Ongoing |
 
-**Total estimate:** 2-3 months working casually, or 4-6 weeks if focused.
+-----
 
----
+## Checklist
 
-## Skills Developed
+  - [ ] Optimize database (WAL mode).
+  - [ ] Refactor Godot nodes to **MultiMeshInstance2D** for 1,000+ entities.
+  - [ ] Build "F3-style" Telemetry Overlay in Godot.
+  - [ ] Implement `report` command in CLI for automated PNG generation.
+  - [ ] Add natural selection algorithms.
+  - [ ] Create sprites for water, grass, and predators.
 
-**Programming**
-- Python OOP (classes, methods, inheritance)
-- GDScript (Godot's scripting language)
-- Client-server communication (HTTP, JSON, WebSockets)
-
-**Data & Databases**
-- SQL basics (SQLite)
-- Data cleaning and analysis (Pandas)
-- Data visualization (Matplotlib, Grafana)
-- Time-series data interpretation
-
-**Software Engineering**
-- Version control (Git & GitHub)
-- Cloud deployment and server management
-- Project structure and organization
-- Debugging and testing
-- Documentation writing
-
-**Simulation & Modeling**
-- Agent-based modeling concepts
-- Rule-based system design
-- Emergent behavior analysis
-- Experimental thinking (changing variables, measuring impact)
-
-**Soft Skills**
-- Analytical thinking
-- Storytelling with data
-- Technical documentation
-- Project planning and phased execution
-
----
-
-## 📈 Status and Screenshots: 
-Godot  — modifying creature behavior and attributes, and generating data analysis reports. 
-
-Terminal: 12 erfs, 10 water, 10 food:
-
-![](github-images/terminal-screenshot.png)
-
-From godot: 200 "erfs", 10 water, 10 food.
-
-![](github-images/godot-screenshot.png)
-
-A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
-
-![](github-images/graph1.png)
-
-
----
+-----
 
 ## License
+
 MIT License — free to use, modify, and distribute.

@@ -18,8 +18,8 @@ from creatures.r2.water_source import WaterSource
 from database import Database
 
 # ── Configuration ─────────────────
-RESUME = True
-RESUME_ID = 3
+RESUME = False
+RESUME_ID = 4
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
