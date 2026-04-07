@@ -145,6 +145,7 @@ The simulation is designed to run 24/7 on a server:
   - [ ] Build "F3-style" Telemetry Overlay in Godot.
   - [ ] Implement `report` command in CLI for automated PNG generation.
   - [ ] Add natural selection algorithms.
+  - [ ] Add new predator
   - [ ] Create sprites for water, grass, and predators.
 
 -----

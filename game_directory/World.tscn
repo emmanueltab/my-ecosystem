@@ -1,9 +1,34 @@
-[gd_scene load_steps=2 format=3 uid="uid://crq3wwxuxvv3f"]
+[gd_scene load_steps=3 format=3 uid="uid://crq3wwxuxvv3f"]
 
 [ext_resource type="Script" uid="uid://c16bxlsklynu6" path="res://world.gd" id="1_c6gwx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c6gwx"]
+bg_color = Color(0.6, 0.6, 0.6, 0.5882353)
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_c6gwx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(577, 323)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="PanelContainer" type="PanelContainer" parent="HUD"]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_c6gwx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
+layout_mode = 2
+
+[node name="RunName" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TickCount" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Population" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FPS" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
