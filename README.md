@@ -151,32 +151,24 @@ The simulation is designed to run 24/7 on a server:
 
 -----
 
- ## 📈 Status and Screenshots:
-
-optimizing the database. simulation stops running after many ticks. figure out how the final product will look like when done.
-
+ ## creenshots:
 
 Terminal: 12 erfs, 10 water, 10 food:
-
-
 ![](github-images/terminal-screenshot.png)
 
 
 From godot: 200 "erfs", 10 water, 10 food.
-
-
 ![](github-images/godot-screenshot.png)
 
 
 A graph showing the population over many ticks. 100 erfs, 50 food, and 50 water evenly distributed across the world:
-
-
 ![](github-images/populationgraph.png)
 
 A graph showing the population of males vs females over ticks. Same configuration.
-
 ![](github-images/malesvsfemales.png)
---- 
+
+-----
+
 ## License
 
 MIT License — free to use, modify, and distribute.
