@@ -39,6 +39,8 @@ func _process(delta):
 				_update_creatures(data["creatures"])
 			if data.has("resources"):
 				_update_resources(data["resources"])
+			
+			$HUD.update_overlay(data)
 
 	# Run the visual smoothing every frame
 	_interpolate_entities(delta)

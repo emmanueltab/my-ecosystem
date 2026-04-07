@@ -1,6 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://crq3wwxuxvv3f"]
+[gd_scene load_steps=5 format=3 uid="uid://crq3wwxuxvv3f"]
 
 [ext_resource type="Script" uid="uid://c16bxlsklynu6" path="res://world.gd" id="1_c6gwx"]
+[ext_resource type="Script" uid="uid://ccm2dwyqw6tgb" path="res://hud.gd" id="2_bcbcq"]
+[ext_resource type="FontFile" uid="uid://ro4yr2fv4434" path="res://assets/JetBrainsMono-2.304/fonts/ttf/JetBrainsMono-Regular.ttf" id="3_js7pq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c6gwx"]
 bg_color = Color(0.6, 0.6, 0.6, 0.5882353)
@@ -12,6 +14,7 @@ script = ExtResource("1_c6gwx")
 position = Vector2(577, 323)
 
 [node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("2_bcbcq")
 
 [node name="PanelContainer" type="PanelContainer" parent="HUD"]
 offset_right = 40.0
@@ -23,12 +26,24 @@ layout_mode = 2
 
 [node name="RunName" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
 
 [node name="TickCount" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
 
 [node name="Population" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
 
 [node name="FPS" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
+
+[node name="BirthRate" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
+
+[node name="MaleFemaleRatio" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_js7pq")
