@@ -141,13 +141,14 @@ The simulation is designed to run 24/7 on a server:
 
 ## Checklist
 
-  - [ ] Optimize database (WAL mode).
+  - [60%] Optimize database (WAL mode).
   - [ ] Refactor Godot nodes to **MultiMeshInstance2D** for 1,000+ entities.
-  - [ ] Build "F3-style" Telemetry Overlay in Godot.
+  - [90%] Build "F3-style" Telemetry Overlay in Godot.
   - [ ] Implement `report` command in CLI for automated PNG generation.
   - [ ] Add natural selection algorithms.
-  - [ ] Add new predator
+  - [70%] Add new predator 
   - [ ] Create sprites for water, grass, and predators.
+  - [ ] Create configuration folder with jsons to facilitate creating new runs  
 
 -----
 
