@@ -61,7 +61,7 @@ class Glooper(BaseCreature):
         if self.food_level < (self.food_capacity * 0.8):
             # Find all Erfs that are currently alive
             prey_list = [o for o in visible 
-                         if getattr(o, "name", "") == "Erf" and o.alive]
+                         if getattr(o, "name", "") == "erf" and o.alive]
             
             if prey_list:
                 target_prey = min(prey_list, key=lambda o: math.dist(self.position, o.position))

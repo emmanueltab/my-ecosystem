@@ -2,6 +2,7 @@ import time
 import random
 import math
 from creatures.r2.erf import erf
+from creatures.r2.glooper import Glooper
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 
@@ -23,8 +24,11 @@ class Simulation:
         self.tick_count    = 0
         self.running       = False
 
-        
-        self.avaliable_creatures = ["erf", "glooper"]
+    # Registry for dynamic loading
+        self.creature_registry = {
+            "erf": erf,
+            "Glooper": Glooper
+        }
 
     # adder functions (creatures, food, and water)
     def add_creature(self, creature):
@@ -43,89 +47,94 @@ class Simulation:
         }
 
     def tick(self):
-        """represents one unit of time. This is what occurs in each time unit of the simulation."""
-
+        """Represents one unit of time."""
         self.tick_count += 1
         print(f"\n--- Tick {self.tick_count} ---")
 
-        # combine food, water, and creatures into one list for seeking
+        # Combine food, water, and creatures into one list for seeking
         world_objects = (list(self.food_sources.values()) +
                          list(self.water_sources.values()) +
                          list(self.creatures.values()))
 
-        # update all creatures
-        for creature in self.creatures.values():
-            creature.seek(world_objects, self.world_width, self.world_height)
-            creature.update() # get older, lose energy levels, die, etc)
-            print(creature)
-
-        # replenish all world objects at every tick
-        for food in self.food_sources.values():
-            food.replenish()
-        for water in self.water_sources.values():
-            water.replenish()
-
-        # handle reproduction
+        # Handle Reproduction and Births
         new_creatures = []
-        for creature in self.creatures.values():
+        
+        # 1. Update all creatures
+        for creature in list(self.creatures.values()):
+            # Handle special birth signals (like Gloopers)
+            signal = creature.seek(world_objects, self.world_width, self.world_height)
+            if signal == "birth_event":
+                species_class = self.creature_registry.get(creature.name)
+                if species_class:
+                    new_creatures.append(species_class(creature.position))
+                    print(f"Birth Event: New {creature.name} born via gestation!")
+
+            creature.update() # Age, metabolism, etc.
+            
+            # 2. Handle standard contact reproduction (Erf style)
             nearby = [c for c in self.creatures.values()
                       if c != creature
                       and math.dist(creature.position, c.position) <= creature.vision_range]
             offspring = creature.reproduce(nearby)
             if offspring:
                 new_creatures.append(offspring)
-                print(f"New {offspring.name} [{offspring.sex}] born!")
+                print(f"New {offspring.name} [{offspring.sex}] born via contact!")
 
+        # Add all newborns to simulation
         for offspring in new_creatures:
             self.add_creature(offspring)
 
-        # last action for the simulaton. Removes dead creatures every tick.
+        # Replenish resources
+        for food in self.food_sources.values():
+            food.replenish()
+        for water in self.water_sources.values():
+            water.replenish()
+
+        # Final cleanup
         self.remove_dead()
         print(f"Population: {len(self.creatures)}")
 
-        # save the dictionaries of ehe state to the database if connected
-        if self.db:
+        # Save to DB if connected (Every 10 ticks)
+        if self.db and self.tick_count % 10 == 0:
             tick_id = self.db.save_tick(self.tick_count, len(self.creatures))
             self.db.save_creature_states(tick_id, self.creatures)
             self.db.save_resource_states(tick_id, self.food_sources, self.water_sources)
 
     def load_state(self, db, run_id):
-        """Loads the last saved state of a run using dictionary keys."""
+        """Loads the last saved state of a run."""
         result = db.get_last_tick(run_id)
         if not result:
             print(f"⚠️ No saved state found for run_id: {run_id}")
             return
 
-        # result is a sqlite3.Row, access by name
         tick_id = result["id"]
         self.tick_count = result["tick_number"]
         print(f"🔄 Resuming from tick {self.tick_count}...")
 
-        # Clear current simulation state to avoid duplicates
         self.creatures.clear()
         self.food_sources.clear()
         self.water_sources.clear()
 
-        # reload creatures
+        # Reload creatures dynamically via Registry
         for row in db.get_creature_states(tick_id):
-            # row is a dict thanks to the DB update
             pos = (row["pos_x"], row["pos_y"])
+            species_name = row["species"]
             
-            if row["species"] == "erf":
-                creature = erf(pos)
-                creature.id = row["creature_id"]
-                # Convert "F"/"M" or 0/1 back to simulation booleans
-                creature.sex = True if row["sex"] == "F" else False
-                creature.age = row["age"]
-                creature.food_level = row["food_level"]
-                creature.water_level = row["water_level"]
-                creature.alive = bool(row["alive"])
-                self.add_creature(creature)
+            # Use registry to find the correct class
+            CreatureClass = self.creature_registry.get(species_name, erf)
+            creature = CreatureClass(pos)
+            
+            creature.id = row["creature_id"]
+            creature.sex = True if row["sex"] == "F" else False
+            creature.age = row["age"]
+            creature.food_level = row["food_level"]
+            creature.water_level = row["water_level"]
+            creature.alive = bool(row["alive"])
+            self.add_creature(creature)
 
-        # reload resources
+        # Reload resources
         for row in db.get_resource_states(tick_id):
             pos = (row["pos_x"], row["pos_y"])
-            
             if row["resource_type"] == "food":
                 food = FoodSource(pos)
                 food.id = row["resource_id"]
