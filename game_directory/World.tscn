@@ -1,49 +1,42 @@
-[gd_scene load_steps=5 format=3 uid="uid://crq3wwxuxvv3f"]
+[gd_scene format=3 uid="uid://crq3wwxuxvv3f"]
 
 [ext_resource type="Script" uid="uid://c16bxlsklynu6" path="res://world.gd" id="1_c6gwx"]
 [ext_resource type="Script" uid="uid://ccm2dwyqw6tgb" path="res://hud.gd" id="2_bcbcq"]
-[ext_resource type="FontFile" uid="uid://ro4yr2fv4434" path="res://assets/JetBrainsMono-2.304/fonts/ttf/JetBrainsMono-Regular.ttf" id="3_js7pq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c6gwx"]
 bg_color = Color(0.6, 0.6, 0.6, 0.5882353)
 
-[node name="World" type="Node2D"]
+[node name="World" type="Node2D" unique_id=1842547368]
 script = ExtResource("1_c6gwx")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1213971757]
 position = Vector2(577, 323)
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=526498755]
 script = ExtResource("2_bcbcq")
 
-[node name="PanelContainer" type="PanelContainer" parent="HUD"]
+[node name="PanelContainer" type="PanelContainer" parent="HUD" unique_id=2002402064]
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_c6gwx")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PanelContainer" unique_id=387163476]
 layout_mode = 2
 
-[node name="RunName" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="RunName" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=1681201975]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")
 
-[node name="TickCount" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="TickCount" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=936747881]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")
 
-[node name="Population" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="Population" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=1548923518]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")
 
-[node name="FPS" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="FPS" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=1920235257]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")
 
-[node name="BirthRate" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="BirthRate" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=1635209977]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")
 
-[node name="MaleFemaleRatio" type="Label" parent="HUD/PanelContainer/VBoxContainer"]
+[node name="MaleFemaleRatio" type="Label" parent="HUD/PanelContainer/VBoxContainer" unique_id=1252869973]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_js7pq")

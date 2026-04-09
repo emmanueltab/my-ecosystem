@@ -7,54 +7,36 @@ class BaseCreature:
     https://www.geeksforgeeks.org/python/__init__-in-python/
     variables in the parameters may vary per creature.
     those declared with a hard value are univeral."""
-    def __init__(self, name, dimension, position, speed, vision_range, 
-                 food_capacity, water_capacity):
+    def __init__(self, position, speed, vision_range, food_capacity, water_capacity, max_age=None, name="BaseCreature", dimension="2D"):
         # Identity
         self.id           = str(uuid.uuid4()) 
         self.name         = name 
         self.dimension    = dimension
         self.alive        = True
         self.age          = 0
-
-        # Reproduction
-        # values are hardcoded now but can be changed later for experiments
-        self.sex                         = self.assign_sex()
-        self.reproduction_threshold      = 80
-        self.reproduction_cooldown       = 0
-        self.reproduction_cooldown_duration = 40
-        self.reproduction_age_threshold  = 20
-        self.mate_target                 = None
+        self.max_age      = max_age
 
         # Movement
         self.position     = position
         self.speed        = speed
-        # direction is random when the creature ihe first created
         self.direction    = random.uniform(0, 360)
 
-        # NEW: Idle/Wander Logic
-        self.is_idling = False
-        self.idle_timer = 0
         # Vision
         self.vision_range = vision_range
 
-        # food_level & water_level
-        # value comes from the parameter. might vary per creature:
+        # Resources (fundamental)
         self.food_capacity   = food_capacity
-        self.food_level      = food_capacity
+        self.food_level      = food_capacity // 2
         self.water_capacity  = water_capacity
-        self.water_level     = water_capacity
+        self.water_level     = water_capacity // 2
 
     def update(self):
-        """Called every tick. Creatures die if food_level is depleted or low age"""
+        """Called every tick. Creatures die if food_level is depleted or max_age."""
         if self.alive:
             self.age    += 1
             self.food_level -= 0.5
             self.water_level -= 1
-            if self.food_level <= 0 or self.water_level <= 0:
-                self.die()
-            if self.reproduction_cooldown > 0:
-                self.reproduction_cooldown -= 1
-            if self.max_age is not None and self.age >= self.max_age:
+            if self.food_level <= 0 or self.water_level <= 0 or (self.max_age is not None and self.age >= self.max_age):
                 self.die()
 
     def move(self, world_width, world_height):
@@ -106,182 +88,56 @@ class BaseCreature:
         """Returns the type of this object for world scanning."""
         return "creature"
 
-    def _is_valid_mate(self, candidate):
-        return (candidate is not None
-                and candidate is not self
-                and isinstance(candidate, self.__class__)
-                and candidate.alive
-                and candidate.sex != self.sex
-                and candidate.ready_to_reproduce
-                and (candidate.mate_target is None or candidate.mate_target is self))
 
-    def clear_mate_target(self):
-        if self.mate_target is not None:
-            if getattr(self.mate_target, "mate_target", None) is self:
-                self.mate_target.mate_target = None
-            self.mate_target = None
 
     def seek(self, world_objects, world_width, world_height):
         """
-        Decision Tree: 
-        1. if ready to reproduce, find a mate.
-        2. Otherwise, check if thirst or hunger is more urgent.
+        Override in subclass to implement behavior.
         """
-        visible = self.look(world_objects)
+        raise NotImplementedError("Override seek() in subclass")
 
-        food  = [o for o in visible if o.get_type() == "food" and o.has_resource()]
-        water = [o for o in visible if o.get_type() == "water" and o.has_resource()]
-        creatures = [o for o in visible if getattr(o, "get_type", lambda: None)() == "creature"]
 
-        if self.mate_target and not self._is_valid_mate(self.mate_target):
-            self.clear_mate_target()
-
-        if self.ready_to_reproduce:
-            partner = self.mate_target
-            if partner is None:
-                candidates = [c for c in creatures
-                              if isinstance(c, self.__class__)
-                              and c.sex != self.sex
-                              and c.alive
-                              and c.ready_to_reproduce
-                              and (c.mate_target is None or c.mate_target is self)]
-                if candidates:
-                    partner = min(candidates, key=lambda o: math.dist(self.position, o.position))
-                    self.mate_target = partner
-                    partner.mate_target = self
-
-            if partner is not None:
-                self.is_idling = False
-                self.move_toward(partner.position, world_width, world_height)
-                return
-
-            # If already ready to reproduce but no partner is visible,
-            # keep searching / wandering instead of refilling resources.
-            self.wander(world_width, world_height)
-            return
-
-        # --- 2. RESOURCE ACQUISITION ---
-        hunger_percent = self.food_level / self.food_capacity
-        thirst_percent = self.water_level / self.water_capacity
-
-        if hunger_percent < thirst_percent:
-            if food:
-                self.is_idling = False
-                target = min(food, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            elif water and thirst_percent < 0.5:
-                target = min(water, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            else:
-                self.wander(world_width, world_height)
-
-        elif thirst_percent < hunger_percent:
-            if water:
-                self.is_idling = False
-                target = min(water, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            elif food and hunger_percent < 0.5:
-                self.is_idling = False
-                target = min(food, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            else:
-                self.wander(world_width, world_height)
-
-        else:
-            if food:
-                self.is_idling = False
-                target = min(food, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            elif water:
-                self.is_idling = False
-                target = min(water, key=lambda o: math.dist(self.position, o.position))
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
-            else:
-                self.wander(world_width, world_height)
-
-    def carnivore_seek(self, world_objects, world_width, world_height):
-        """
-        IN PROGRESS
-        
-        Alternative seek method for carnivorous creatures that hunt other creatures instead of food/water sources.
-        Decision Tree:
-        1. If ready to reproduce, find a mate (same as herbivores).
-        2. Otherwise, look for prey creatures within vision range and pursue the closest one.
-        3. If no prey is visible, wander randomly.
-        """
-        return None
 
     def interact(self, world_object):
-        """Interacts with a world object if close enough."""
+        """Generic interact - override in subclass."""
         dist = math.dist(self.position, world_object.position)
-        # checks the object type. 
-        # get_type(),  has_resource(), and gets... are defined in base_world_object.py
-        if dist <= self.speed + 1:
-            if world_object.get_type() == "food" and world_object.has_resource():
-                amount      = world_object.get_eaten()
-                self.food_level = min(self.food_level + amount, self.food_capacity)
-                print(f"{self.name} ate! food_level: {self.food_level}")
+        if dist <= self.speed + 1 and world_object.has_resource():
+            if world_object.get_type() == "food":
+                self.eat(world_object.get_eaten())
+            elif world_object.get_type() == "water":
+                self.drink(world_object.get_drunk())
 
-            elif world_object.get_type() == "water" and world_object.has_resource():
-                amount      = world_object.get_drunk()
-                self.water_level = min(self.water_level + amount, self.water_capacity)
-                print(f"{self.name} drank! water_level: {self.water_level}")
-
-    def eat(self, food):
-        """Replenishes food_level from a food source."""
+    def eat(self, amount):
+        """Replenishes food_level by amount."""
         if self.alive:
-            self.food_level = min(self.food_level + food.energy_value, self.food_capacity)
+            self.food_level = min(self.food_level + amount, self.food_capacity)
+            print(f"{self.name} ate! food_level: {self.food_level}")
 
-    def drink(self, water):
-        """Replenishes water_level from a water source."""
+    def drink(self, amount):
+        """Replenishes water_level by amount."""
         if self.alive:
-            self.water_level = min(self.water_level + water.thirst_value, self.water_capacity)
+            self.water_level = min(self.water_level + amount, self.water_capacity)
+            print(f"{self.name} drank! water_level: {self.water_level}")
 
     def wander(self, world_width, world_height):
-        """Randomly decides to move or stay still."""
-        # If we are currently idling, count down
-        if self.is_idling:
-            self.idle_timer -= 1
-            if self.idle_timer <= 0:
-                self.is_idling = False
-            return # Don't move while idling!
-
-        # 10% chance to start idling for 2-5 ticks
-        if random.random() < 0.10:
-            self.is_idling = True
-            self.idle_timer = random.randint(2, 5)
-            return
-
-        # Otherwise, move as normal
-        # Suggestion: Only change direction slightly so they don't jitter
-        self.direction += random.uniform(-20, 20) 
+        """Random wander direction."""
+        self.direction += random.uniform(-20, 20)
         self.move(world_width, world_height)
 
 
     # reproduction:
     def assign_sex(self):
-        """Override in child class to define how sex is assigned.
-        Returns True for Female, False for Male by default."""
-        return random.choice([True, False])
+        """Override in subclass."""
+        raise NotImplementedError("Override in subclass")
 
     @property
     def ready_to_reproduce(self):
-        """Returns True if creature is able to reproduce."""
-        return (self.alive
-                and self.age >= self.reproduction_age_threshold
-                and self.reproduction_cooldown == 0
-                and self.food_level >= self.reproduction_threshold
-                and self.water_level >= self.reproduction_threshold)
+        """Override in subclass."""
+        return False
 
     def reproduce(self, nearby_creatures):
-        """Override in child class to define reproduction behavior."""
-        pass
+        """Override in subclass."""
+        return None
 
     def die(self):
         """Marks creature as dead."""

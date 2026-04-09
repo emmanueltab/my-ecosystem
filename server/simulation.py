@@ -2,6 +2,7 @@ import time
 import random
 import math
 from creatures.r2.erf import erf
+from creatures.r2.glooper import glooper  # Added Glooper import
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 
@@ -22,9 +23,6 @@ class Simulation:
         # Simulation state
         self.tick_count    = 0
         self.running       = False
-
-        
-        self.avaliable_creatures = ["erf", "glooper"]
 
     # adder functions (creatures, food, and water)
     def add_creature(self, creature):
@@ -106,13 +104,21 @@ class Simulation:
         self.food_sources.clear()
         self.water_sources.clear()
 
+        # Mapping dictionary to handle multiple species dynamically
+        species_map = {
+            "erf": erf,
+            "glooper": glooper
+        }
+
         # reload creatures
         for row in db.get_creature_states(tick_id):
             # row is a dict thanks to the DB update
             pos = (row["pos_x"], row["pos_y"])
             
-            if row["species"] == "erf":
-                creature = erf(pos)
+            species_name = row["species"]
+            if species_name in species_map:
+                creature_class = species_map[species_name]
+                creature = creature_class(pos)
                 creature.id = row["creature_id"]
                 # Convert "F"/"M" or 0/1 back to simulation booleans
                 creature.sex = True if row["sex"] == "F" else False
@@ -121,6 +127,8 @@ class Simulation:
                 creature.water_level = row["water_level"]
                 creature.alive = bool(row["alive"])
                 self.add_creature(creature)
+            else:
+                print(f"⚠️ Unknown species found in DB: {species_name}")
 
         # reload resources
         for row in db.get_resource_states(tick_id):
