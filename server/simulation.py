@@ -170,3 +170,43 @@ class Simulation:
     def visualize(self):
         # Kept for reference — replaced by Godot in Phase 4
         pass
+
+    def setup_resources(num_food, num_water, food_list, water_list, buffer=5.0):
+
+        """ will have to come back to this later. allignment works but not the section to check if they overlap."""
+
+        # updates 
+        # 1. Align Counts (Priority: Numbers)
+        # Trim if too many, extend with random if too few
+        food_list = food_list[:num_food]
+        while len(food_list) < num_food:
+            food_list.append((random.uniform(0, 100), random.uniform(0, 100)))
+
+        water_list = water_list[:num_water]
+        while len(water_list) < num_water:
+            water_list.append((random.uniform(0, 100), random.uniform(0, 100)))
+
+        # 2. Resolve Overlaps and Distance
+        final_positions = []
+        
+        # Process Food
+        updated_food = []
+        for pos in food_list:
+            current_pos = pos
+            # Check against all previously accepted positions
+            while any(math.sqrt((current_pos[0]-p[0])**2 + (current_pos[1]-p[1])**2) < buffer for p in final_positions):
+                current_pos = (random.uniform(0, 100), random.uniform(0, 100))
+            updated_food.append(current_pos)
+            final_positions.append(current_pos)
+
+        # Process Water
+        updated_water = []
+        for pos in water_list:
+            current_pos = pos
+            # Check against all food AND already placed water
+            while any(math.sqrt((current_pos[0]-p[0])**2 + (current_pos[1]-p[1])**2) < buffer for p in final_positions):
+                current_pos = (random.uniform(0, 100), random.uniform(0, 100))
+            updated_water.append(current_pos)
+            final_positions.append(current_pos)
+        
+        return updated_food, updated_water

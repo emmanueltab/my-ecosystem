@@ -7,50 +7,39 @@ clients over WebSockets.
 
 import random
 import json
+import math
 import asyncio
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import uvicorn
 
 from simulation import Simulation
 from creatures.r2.erf import erf
-from creatures.r2.glooper import glooper  # Added Glooper import
+from creatures.r2.glooper import glooper
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
 from database import Database
 
 # ── Configuration ─────────────────
 RESUME = False
-RESUME_ID = 1
+RESUME_ID = 1  # This can stay for DB logic
+RUN_CONFIG_NAME = "run one" # The key in your JSON
 TICK_RATE = 0.25
 DB_SAVE_INTERVAL = 10
 
-NUMBER_OF_ERFS = 50   # Split the creature count for variety
-NUMBER_OF_GLOOPERS = 0 # Predators should usually have a lower starting pop
-NUMBER_OF_FOOD = 20
-NUMBER_OF_WATER = 20
-
-# Predefined positions for food and water sources
-positions_of_food = [(20, 20), (80, 20), (20, 80), (80, 80), (50, 50), (30, 70), (70, 30), (60, 60), (40, 40), (25, 75), (75, 25), (55, 55), (45, 45), (35, 65), (65, 35), (15, 85), (85, 15), (10, 90), (90, 10), (50, 30), (30, 50), (70, 70), (70, 50), (50, 70)]
-positions_of_water = [(30, 30), (70, 30), (30, 70), (70, 70), (50, 20), (20, 50), (80, 50), (50, 80), (40, 60), (60, 40)]
-
-# if there are more food sources than predefined positions, generate random positions
-if NUMBER_OF_FOOD > len(positions_of_food):
-    pos_needed = NUMBER_OF_FOOD - len(positions_of_food)
-    for _ in range(pos_needed):
-        positions_of_food.append((random.uniform(0, 100), random.uniform(0, 100)))
-elif NUMBER_OF_FOOD < len(positions_of_food):
-    positions_of_food = positions_of_food[:NUMBER_OF_FOOD]
-
-# if there are more water sources than predefined positions, generate random positions
-if NUMBER_OF_WATER > len(positions_of_water):
-    pos_needed = NUMBER_OF_WATER - len(positions_of_water)
-    for _ in range(pos_needed):
-        positions_of_water.append((random.uniform(0, 100), random.uniform(0, 100)))
-elif NUMBER_OF_WATER < len(positions_of_water):
-    positions_of_water = positions_of_water[:NUMBER_OF_WATER]
-
 sim: Simulation | None = None
 connected_clients: list[WebSocket] = []
+
+def load_config(config_name):
+    """Loads a specific run configuration from the JSON file."""
+    config_path = os.path.join(os.path.dirname(__file__), "runs_config.json")
+    try:
+        with open(config_path, "r") as f:
+            data = json.load(f)
+            return data.get(config_name)
+    except FileNotFoundError:
+        print("❌ Error: run_configs.json not found in server directory.")
+        return None
 
 def get_snapshot():
     """takes snapshot of the simulation and shrinks it into Dictionary."""
@@ -102,32 +91,53 @@ def _sync_save(db: Database, tick_count: int):
     db.save_resource_states(tick_id, sim.food_sources, sim.water_sources)
 
 async def run_simulation():                 
-    """Initialize the simulation with both erfs and gloopers."""
+    """Initialize the simulation using the JSON config."""
     global sim
     db = Database()
     sim = Simulation(db=db)
+
+    # 1. Load the configuration
+    config = load_config(RUN_CONFIG_NAME)
+    if not config:
+        print(f"❌ Could not load config: {RUN_CONFIG_NAME}. Stopping.")
+        return
 
     if RESUME:
         db.resume_run(RESUME_ID)
         sim.load_state(db, RESUME_ID)
     else:
-        db.start_run(f"Run {RESUME_ID}", "Predator-Prey Baseline")
+        # Use the name from JSON for the DB run name
+        db.start_run(RUN_CONFIG_NAME, "Configured JSON Run")
 
-        # Spawn Erfs
-        for _ in range(NUMBER_OF_ERFS):
-            sim.add_creature(erf((random.uniform(0, 100), random.uniform(0, 100))))
-        
-        # Spawn Gloopers
-        for _ in range(NUMBER_OF_GLOOPERS):
-            sim.add_creature(glooper((random.uniform(0, 100), random.uniform(0, 100))))
-        
-        for pos in positions_of_food:
+        # 2. Extract values from config
+        num_erfs = config.get("num_erfs", 0)
+        num_gloopers = config.get("num_gloopers", 0)
+        num_food = config.get("num_food", 0)
+        num_water = config.get("num_water", 0)
+        raw_food_pos = config.get("food_positions", [])
+        raw_water_pos = config.get("water_positions", [])
+
+        # 3. Use your static method to align counts and fix overlaps
+        final_food, final_water = Simulation.setup_resources(
+            num_food, num_water, raw_food_pos, raw_water_pos
+        )
+
+        # 4. Spawn Resources
+        for pos in final_food:
             sim.add_food(FoodSource(pos))
 
-        for pos in positions_of_water:
+        for pos in final_water:
             sim.add_water(WaterSource(pos, quantity=1500, replenish_rate=10))
 
-    print("✅ Simulation Initialized with erfs and gloopers")
+        # 5. Spawn Creatures
+        for _ in range(num_erfs):
+            sim.add_creature(erf((random.uniform(0, 100), random.uniform(0, 100))))
+        
+        for _ in range(num_gloopers):
+            sim.add_creature(glooper((random.uniform(0, 100), random.uniform(0, 100))))
+
+    print(f"✅ Simulation Initialized: {RUN_CONFIG_NAME}")
+    print(f"Stats: {len(sim.creatures)} Creatures, {num_food} Food, {num_water} Water")
 
     while True:
         sim.tick()
