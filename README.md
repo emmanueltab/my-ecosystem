@@ -1,6 +1,6 @@
 # Ecosystem Simulation & Analytics Platform
 
-  ![](github-images/erf-ascii.png) 
+![](github-images/erf-ascii.png) 
 
 A continuously running server-based simulation of a living ecosystem populated by autonomous entities and world objects. The simulation can be controlled in real time via a CLI — run, paused, reset, and configured to adjust environmental settings. All simulation data is sent to Godot for high-performance visualization using WebSockets and logged to a SQLite database. Live telemetry is displayed directly within the Godot scene, while deep data science experiments and research reports are generated via Python scripts and Jupyter Notebooks.
 
