@@ -111,30 +111,35 @@ class Database:
         self.cursor.executemany('INSERT INTO resource_states (tick_id, resource_id, resource_type, quantity, pos_x, pos_y) VALUES (?,?,?,?,?,?)', data)
         self.connection.commit()
 
-    def delete_run(self, run_id):
-        """Deletes a simulation run and all associated data."""
-        # Check if run exists
-        self.cursor.execute('SELECT id FROM runs WHERE id = ?', (run_id,))
-        if not self.cursor.fetchone():
-            print(f"Run ID {run_id} does not exist.")
+    def delete_run(self, run_name):
+        """Deletes a simulation run and all associated data using the run name."""
+        # 1. Find the internal ID based on the name provided in CLI
+        self.cursor.execute('SELECT id FROM runs WHERE name = ?', (run_name,))
+        result = self.cursor.fetchone()
+        
+        if not result:
+            print(f"Run name '{run_name}' does not exist in the database.")
             return False
         
-        # Get all tick_ids for this run
+        run_id = result[0]
+        
+        # 2. Get all tick_ids for this run
         self.cursor.execute('SELECT id FROM ticks WHERE run_id = ?', (run_id,))
         tick_ids = [row[0] for row in self.cursor.fetchall()]
         
-        # Delete creature_states and resource_states for these ticks
+        # 3. Delete creature_states and resource_states for these ticks
         if tick_ids:
             placeholders = ','.join('?' for _ in tick_ids)
+            # We use f-strings here only for the placeholders count; the data is still parameterized
             self.cursor.execute(f'DELETE FROM creature_states WHERE tick_id IN ({placeholders})', tick_ids)
             self.cursor.execute(f'DELETE FROM resource_states WHERE tick_id IN ({placeholders})', tick_ids)
         
-        # Delete ticks
+        # 4. Delete ticks
         self.cursor.execute('DELETE FROM ticks WHERE run_id = ?', (run_id,))
         
-        # Delete the run
+        # 5. Delete the run itself
         self.cursor.execute('DELETE FROM runs WHERE id = ?', (run_id,))
         
         self.connection.commit()
-        print(f"Run ID {run_id} and all associated data have been deleted.")
+        print(f"Successfully wiped all data for run: '{run_name}' (ID: {run_id})")
         return True

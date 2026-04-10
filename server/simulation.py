@@ -5,7 +5,7 @@ from creatures.r2.erf import erf
 from creatures.r2.glooper import glooper  # Added Glooper import
 from creatures.r2.food_source import FoodSource
 from creatures.r2.water_source import WaterSource
-
+                                     
 class Simulation:
     def __init__(self, world_width=100, world_height=100, db=None):
         # World boundaries
