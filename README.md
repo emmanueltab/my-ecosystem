@@ -144,12 +144,13 @@ The simulation is designed to run 24/7 on a server:
 
   - [60%] Optimize database (WAL mode).
   - [ ] Refactor Godot nodes to **MultiMeshInstance2D** for 1,000+ entities.
-  - [90%] Build "F3-style" Telemetry Overlay in Godot.
+  - [100%] Build "F3-style" Telemetry Overlay in Godot.
   - [ ] Implement `report` command in CLI for automated PNG generation.
   - [ ] Add natural selection algorithms.
   - [70%] Add new predator 
-  - [ ] Create sprites for water, grass, and predators.
-  - [ ] Create configuration folder with jsons to facilitate creating new runs  
+  - [50%] Create sprites for water, grass, and predators.
+  - 1. [   ] Need to fix erf reproduction behavior. 
+  - [60%] Create configuration file with jsons to facilitate creating new runs  
 
 -----
 
