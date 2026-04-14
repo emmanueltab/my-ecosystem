@@ -1,7 +1,7 @@
 {
   "run one": {
-    "num_erfs": 100,
-    "num_gloopers": 2,
+    "num_erfs": 1,
+    "num_gloopers": 0,
     "num_food": 20,
     "num_water": 20,
     "food_positions": [

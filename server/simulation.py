@@ -64,15 +64,13 @@ class Simulation:
             water.replenish()
 
         # handle reproduction
+        # Inside simulation.py tick()
         new_creatures = []
-        for creature in self.creatures.values():
-            nearby = [c for c in self.creatures.values()
-                      if c != creature
-                      and math.dist(creature.position, c.position) <= creature.vision_range]
-            offspring = creature.reproduce(nearby)
+        for creature in list(self.creatures.values()):
+            # We pass world_objects so the creature can 'see' its mate
+            offspring = creature.reproduce(world_objects) 
             if offspring:
                 new_creatures.append(offspring)
-                print(f"New {offspring.name} [{offspring.sex}] born!")
 
         for offspring in new_creatures:
             self.add_creature(offspring)

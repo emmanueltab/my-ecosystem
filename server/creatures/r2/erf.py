@@ -90,15 +90,22 @@ class erf(BaseCreature):
             self.move(world_width, world_height)
             return
 
-        # Reproduce
+        # In erf.py seek()
         if self.ready_to_reproduce:
-            self.wander(world_width, world_height)
-            return
+            # Use the 'visible' list we already calculated!
+            mates = [o for o in visible if getattr(o, 'name', '') == 'erf' and 
+                    o.sex != self.sex and o.ready_to_reproduce]
+            if mates:
+                target = min(mates, key=lambda m: math.dist(self.position, m.position))
+                self.move_toward(target.position, world_width, world_height)
+                return # Priority: Mating over Food/Wander
 
         # Resources
         if self.food_level < 50 or self.water_level < 50:
+            # all the food and water that is within it's field of view:
             food = [o for o in visible if o.get_type() == 'food' and o.has_resource()]
             water = [o for o in visible if o.get_type() == 'water' and o.has_resource()]
+
             if food or water:
                 # Prioritize lower level
                 if self.food_level < self.water_level:
@@ -111,6 +118,7 @@ class erf(BaseCreature):
                         target = min(water, key=lambda o: math.dist(self.position, o.position))
                     else:
                         target = min(food, key=lambda o: math.dist(self.position, o.position))
+                        
                 self.move_toward(target.position, world_width, world_height)
                 self.interact(target)
                 return
