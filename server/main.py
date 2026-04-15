@@ -94,7 +94,7 @@ async def run_simulation():
 
     config = load_config(RUN_CONFIG_NAME)
     if not config and not RESUME:
-        print(f"❌ Configuration '{RUN_CONFIG_NAME}' not found in JSON.")
+        print(f"Configuration '{RUN_CONFIG_NAME}' not found in JSON.")
         return
 
     if RESUME:
@@ -106,7 +106,7 @@ async def run_simulation():
             db.resume_run(actual_id)
             sim.load_state(db, actual_id)
         else:
-            print(f"❌ Cannot resume: '{RUN_CONFIG_NAME}' not found in Database.")
+            print(f"Cannot resume: '{RUN_CONFIG_NAME}' not found in Database.")
             return
     else:
         db.start_run(RUN_CONFIG_NAME, "New Simulation")
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         if cmd == "exit": break
 
         if len(choice) < 2:
-            print("❌ Error: Missing run name. (e.g. create \"run one\")")
+            print("Error: Missing run name. (e.g. create \"run one\")")
             input("Press Enter to continue...")
             continue
 
@@ -192,5 +192,5 @@ if __name__ == "__main__":
                 print("\n[!] Simulation Stopped. Returning to menu...")
                 input("Press Enter...")
         else:
-            print(f"❌ Unknown command: {cmd}")
+            print(f"Unknown command: {cmd}")
             input("Press Enter...")
