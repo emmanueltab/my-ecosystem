@@ -1,5 +1,7 @@
 {
   "run one": {
+    "world_width": 100,
+    "world_height": 100,
     "num_erfs": 4,
     "num_gloopers": 0,
     "num_food": 20,

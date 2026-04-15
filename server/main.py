@@ -89,10 +89,13 @@ async def broadcast_snapshot():
 
 async def run_simulation():                 
     global sim
-    db = Database()
-    sim = Simulation(db=db)
-
     config = load_config(RUN_CONFIG_NAME)
+    width = config.get("world_width")
+    height = config.get("world_width")
+
+    db = Database()
+    sim = Simulation(world_width=width, world_height=height, db=db)
+
     if not config and not RESUME:
         print(f"Configuration '{RUN_CONFIG_NAME}' not found in JSON.")
         return
@@ -118,9 +121,9 @@ async def run_simulation():
         for pos in f_pos: sim.add_food(FoodSource(pos))
         for pos in w_pos: sim.add_water(WaterSource(pos, quantity=1500, replenish_rate=10))
         for _ in range(config.get("num_erfs", 0)):
-            sim.add_creature(erf((random.uniform(0, 100), random.uniform(0, 100))))
+            sim.add_creature(erf((random.uniform(0, width), random.uniform(0, height))))
         for _ in range(config.get("num_gloopers", 0)):
-            sim.add_creature(glooper((random.uniform(0, 100), random.uniform(0, 100))))
+            sim.add_creature(glooper((random.uniform(0, width), random.uniform(0, height))))
 
     while True:
         sim.tick()
