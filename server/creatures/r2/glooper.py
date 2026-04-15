@@ -8,7 +8,7 @@ class glooper(BaseCreature):
     def __init__(self, position):
         super().__init__(
             position, speed=0.9, vision_range=15, food_capacity=200,
-            water_capacity=200, max_age=400, name="glooper", dimension="2D"
+            water_capacity=200, hunger_rate=0.2, thirst_rate=0.2, max_age=400, name="glooper", dimension="2D"
         )
         self.sex = random.choice([True, False])  # True=F, False=M
         self.reproduction_threshold = 80

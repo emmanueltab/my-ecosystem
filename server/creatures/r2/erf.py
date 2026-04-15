@@ -8,11 +8,11 @@ class erf(BaseCreature):
     def __init__(self, position):
         super().__init__(
             position, speed=2, vision_range=15, food_capacity=100,
-            water_capacity=100, max_age=400, name="erf", dimension="2D"
+            water_capacity=100, hunger_rate=0.2, thirst_rate=0.2, max_age=400, aging_rate=0.5, name="erf", dimension="2D"
         )
         # Reproduction
         self.sex = random.choice([True, False])  # True=F, False=M
-        self.reproduction_threshold = 65
+        self.reproduction_threshold = 50
         self.reproduction_cooldown = 0
         self.reproduction_cooldown_duration = 30
         self.reproduction_age_threshold = 20
@@ -26,8 +26,8 @@ class erf(BaseCreature):
     def update(self):
         """ERF-specific update with gestation costs."""
         if self.pregnant:
-            self.food_level -= 0.4
-            self.water_level -= 0.6
+            self.food_level -= self.hunger_rate * 1.2
+            self.water_level -= self.hunger_rate * 1.2 
         super().update()
 
         if self.pregnant and self.alive:
@@ -90,8 +90,7 @@ class erf(BaseCreature):
             self.move(world_width, world_height)
             return
 
-        # In erf.py seek()
-        if self.ready_to_reproduce:
+        elif self.ready_to_reproduce:
             # Use the 'visible' list we already calculated!
             mates = [o for o in visible if getattr(o, 'name', '') == 'erf' and 
                     o.sex != self.sex and o.ready_to_reproduce]
@@ -100,29 +99,62 @@ class erf(BaseCreature):
                 self.move_toward(target.position, world_width, world_height)
                 return # Priority: Mating over Food/Wander
 
-        # Resources
-        if self.food_level < 50 or self.water_level < 50:
-            # all the food and water that is within it's field of view:
-            food = [o for o in visible if o.get_type() == 'food' and o.has_resource()]
-            water = [o for o in visible if o.get_type() == 'water' and o.has_resource()]
+        # new logic tree:
+        # note: need to make water and food consumption faster than the thirst and hunger rates.
+        # that way if the resources are spread out, the erfs wont get be stuck getting resources.
+        # if (w <= 50) and (f >= 50):
+        # elif (w <= 50) or (if <= 50):
+        #   if (w < f):
+        #      search water()
+        #   elif (f < w):
+        #       search food()
+        #   elif (f == w):
+        #       search w or f. random(50%)
 
-            if food or water:
-                # Prioritize lower level
-                if self.food_level < self.water_level:
-                    if food:
-                        target = min(food, key=lambda o: math.dist(self.position, o.position))
-                    else:
-                        target = min(water, key=lambda o: math.dist(self.position, o.position))
+        # Resources Logic
+        if self.food_level < self.reproduction_threshold or self.water_level < self.reproduction_threshold:
+            food_sources = [o for o in visible if o.get_type() == 'food' and o.has_resource()]
+            water_sources = [o for o in visible if o.get_type() == 'water' and o.has_resource()]
+
+            target = None
+
+            # 1. Logic for (w <= 50) and (f <= 50) AND (f == w)
+            if self.food_level == self.water_level:
+                choice = random.choice(['f', 'w'])
+                if choice == 'f':
+                    target = min(food_sources, key=lambda o: math.dist(self.position, o.position)) if food_sources else None
                 else:
-                    if water:
-                        target = min(water, key=lambda o: math.dist(self.position, o.position))
-                    else:
-                        target = min(food, key=lambda o: math.dist(self.position, o.position))
-                        
-                self.move_toward(target.position, world_width, world_height)
-                self.interact(target)
+                    target = min(water_sources, key=lambda o: math.dist(self.position, o.position)) if water_sources else None
+
+            # 2. Logic for (w < f) - Priority: Water
+            elif self.water_level < self.food_level:
+                if water_sources:
+                    target = min(water_sources, key=lambda o: math.dist(self.position, o.position))
+                else:
+                    # SEARCH MODE: I need water but don't see it. 
+                    # Pick a direction and move until I find it.
+                    self.wander(world_width, world_height)
+                    return
+
+            # 3. Logic for (f < w) - Priority: Food
+            elif self.food_level < self.water_level:
+                if food_sources:
+                    target = min(food_sources, key=lambda o: math.dist(self.position, o.position))
+                else:
+                    # SEARCH MODE: I need food but don't see it.
+                    self.wander(world_width, world_height)
+                    return
+
+            # EXECUTION: If a target was found in FOV, move to it or eat it
+            if target:
+                dist = math.dist(self.position, target.position)
+                if dist <= self.speed:
+                    self.interact(target)
+                else:
+                    self.move_toward(target.position, world_width, world_height)
                 return
 
+        # DEFAULT: If levels > 50 or we are just exploring
         self.wander(world_width, world_height)
 
     def get_type(self):

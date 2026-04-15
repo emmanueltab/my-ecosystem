@@ -7,7 +7,7 @@ class BaseCreature:
     https://www.geeksforgeeks.org/python/__init__-in-python/
     variables in the parameters may vary per creature.
     those declared with a hard value are univeral."""
-    def __init__(self, position, speed, vision_range, food_capacity, water_capacity, max_age=None, name="BaseCreature", dimension="2D"):
+    def __init__(self, position, speed, vision_range, food_capacity, water_capacity, hunger_rate, thirst_rate, aging_rate, max_age=None, name="BaseCreature", dimension="2D"):
         # Identity
         self.id           = str(uuid.uuid4()) 
         self.name         = name 
@@ -15,6 +15,7 @@ class BaseCreature:
         self.alive        = True
         self.age          = 0
         self.max_age      = max_age
+        self.aging_rate   = aging_rate
 
         # Movement
         self.position     = position
@@ -29,13 +30,16 @@ class BaseCreature:
         self.food_level      = food_capacity // 2
         self.water_capacity  = water_capacity
         self.water_level     = water_capacity // 2
+        self.hunger_rate     = hunger_rate
+        self.thirst_rate     = thirst_rate
 
     def update(self):
-        """Called every tick. Creatures die if food_level is depleted or max_age."""
+        """Called every tick. Gains hunger and thirst. Creatures die if food_level is depleted or max_age."""
         if self.alive:
-            self.age    += 1
-            self.food_level -= 0.5
-            self.water_level -= 1
+            self.age    += self.aging_rate
+            # Subtract and round to 3 decimal places
+            self.food_level = round(self.food_level - self.hunger_rate, 3)
+            self.water_level = round(self.water_level - self.thirst_rate, 3)
             if self.food_level <= 0 or self.water_level <= 0 or (self.max_age is not None and self.age >= self.max_age):
                 self.die()
 
