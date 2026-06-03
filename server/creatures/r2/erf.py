@@ -105,8 +105,6 @@ class erf(BaseCreature):
                
                 return None
             
-
-
         return None
 
     def seek(self, world_objects, world_width, world_height):
