@@ -4,28 +4,27 @@ import math
 
 class BaseCreature:
     """
-    https://www.geeksforgeeks.org/python/__init__-in-python/
-    variables in the parameters may vary per creature.
-    those declared with a hard value are univeral."""
-    def __init__(self, position, speed, vision_range, food_capacity, water_capacity, hunger_rate, thirst_rate, aging_rate, max_age=None, name="BaseCreature", dimension="2D"):
+    Base class for all creatures. 
+    """
+    def __init__(self, position, speed, vision_range, food_capacity, water_capacity, hunger_rate, thirst_rate, aging_rate, 
+                 max_age=None, name="BaseCreature", dimension="2D"):
+        
         # Identity
-        self.id           = str(uuid.uuid4()) 
-        self.name         = name 
+        self.id           = str(uuid.uuid4())
+        self.name         = name
         self.dimension    = dimension
         self.alive        = True
         self.age          = 0
-        self.max_age      = max_age
         self.aging_rate   = aging_rate
+        self.max_age      = max_age
 
-        # Movement
+        # Movement and Vision
         self.position     = position
         self.speed        = speed
         self.direction    = random.uniform(0, 360)
-
-        # Vision
         self.vision_range = vision_range
 
-        # Resources (fundamental)
+        # Resources and Status
         self.food_capacity   = food_capacity
         self.food_level      = food_capacity // 2
         self.water_capacity  = water_capacity
@@ -92,15 +91,11 @@ class BaseCreature:
         """Returns the type of this object for world scanning."""
         return "creature"
 
-
-
     def seek(self, world_objects, world_width, world_height):
         """
         Override in subclass to implement behavior.
         """
         raise NotImplementedError("Override seek() in subclass")
-
-
 
     def interact(self, world_object):
         """Generic interact - override in subclass."""

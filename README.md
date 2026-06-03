@@ -40,7 +40,7 @@ This project is free and open source. You are welcome to clone it, run your own 
          ▼
 ┌──────────────────┐
 │ ANALYTICS ENGINE │       
-│  Standard 10     │ 
+│  Standard        │ 
 │  PNG Reports     |
 |                  |
 |     PANDAS       |
@@ -111,8 +111,8 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the manager
-python3 manager.py
+# Run the program!
+python3 main.py
 ```
 
 -----
@@ -131,12 +131,12 @@ The simulation is designed to run 24/7 on a server:
 
 | Phase | What Gets Built | Difficulty | Est. Time |
 |-------|----------------|------------|-----------|
-| 1 | Python simulation engine | ⭐⭐ Medium | 1-2 weeks |
-| 2 | SQLite persistence (WAL Mode) | ⭐ Easy | 2-3 days |
-| 3 | Godot MultiMesh Visuals | ⭐⭐⭐ Hard | 2 weeks |
-| 4 | Integrated Godot HUD | ⭐ Easy | 3-5 days |
-| 5 | Automated Report Scripts | ⭐⭐ Medium | 1 week |
-| 6 | Cloud deployment | ⭐⭐ Medium | 3-5 days |
+| 1 | Python simulation engine |  Medium | 1-2 weeks |
+| 2 | SQLite persistence (WAL Mode) |  Easy | 2-3 days |
+| 3 | Godot MultiMesh Visuals |  Hard | 2 weeks |
+| 4 | Integrated Godot HUD |  Easy | 3-5 days |
+| 5 | Automated Report Scripts |  Medium | 1 week |
+| 6 | Cloud deployment |  Medium | 3-5 days |
 
 -----
 

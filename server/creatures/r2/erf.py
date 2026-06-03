@@ -3,25 +3,29 @@ import math
 from creatures.base_creature import BaseCreature
 
 class erf(BaseCreature):
-    """ERF: Fast-moving, short-lived prey that reproduces quickly."""
+    """ERF: Fast-moving, short-lived prey that reproduces quickly.
+    the stuff in the parametersr are the traits that the offspring will inhereit. may consider moving them to a bag."""
 
-    def __init__(self, position):
+    def __init__(self, position, speed=2, vision_range=15, max_age=400):
         super().__init__(
-            position, speed=2, vision_range=15, food_capacity=100,
-            water_capacity=100, hunger_rate=0.2, thirst_rate=0.2, max_age=400, aging_rate=0.5, name="erf", dimension="2D"
+            position, speed=speed, vision_range=vision_range, food_capacity=100,
+            water_capacity=100, hunger_rate=0.2, thirst_rate=0.2, max_age=max_age, aging_rate=0.5, name="erf", dimension="2D"
         )
         # Reproduction
         self.sex = random.choice([True, False])  # True=F, False=M
-        self.reproduction_threshold = 50
+        self.reproduction_threshold = 40 # required food and water in order to reproduce
         self.reproduction_cooldown = 0
         self.reproduction_cooldown_duration = 30
         self.reproduction_age_threshold = 20
 
         # Gestation
         self.pregnant = False
-        self.gestation_duration = 20
+        self.gestation_duration = 20 # amount of ticks pregrancy lasts
         self.gestation_timer = 0
         self.birth_pending = False
+        self.reproduction_cost = 15 # amount of food/water lost after giving birth
+
+        self.father_genes = None
 
     def update(self):
         """ERF-specific update with gestation costs."""
@@ -52,10 +56,31 @@ class erf(BaseCreature):
             return None
 
         if self.birth_pending:
-            self.birth_pending = False
-            self.reproduction_cooldown = self.reproduction_cooldown_duration
-            return erf(self.position)
+                self.birth_pending = False
+                
+                # 1. Calculate the Averages (Inheritance)
+                avg_speed = (self.speed + self.father_genes['speed']) / 2
+                avg_vision = (self.vision_range + self.father_genes['vision']) / 2
+                avg_max_age = (self.max_age + self.father_genes['max_age']) / 2
 
+                # 2. Apply Percentage-Based Mutation (e.g., +/- 10%)
+                # This scales automatically: 10% of 2 is 0.2, 10% of 400 is 40.
+                def mutate(value, percent=0.1):
+                    mutation_multiplier = random.uniform(1 - percent, 1 + percent)
+                    return value * mutation_multiplier
+
+                child_speed   = mutate(avg_speed, percent=0.05)   # 5% mutation
+                child_vision  = mutate(avg_vision, percent=0.05)  # 5% mutation
+                child_max_age = mutate(avg_max_age, percent=0.05) # 5% mutation
+
+                # 3. Create the child with scaled traits
+                return erf(
+                    self.position, 
+                    speed=max(0.5, child_speed), 
+                    vision_range=max(5, child_vision), 
+                    max_age=max(100, child_max_age)
+                )
+       
         if self.pregnant:
             return None
 
@@ -65,13 +90,22 @@ class erf(BaseCreature):
         if mate:
             # Mate if close and eligible
             if math.dist(self.position, mate.position) <= self.vision_range:
-                self.food_level -= 20
-                self.water_level -= 20
+                self.food_level -= self.reproduction_cost
+                self.water_level -= self.reproduction_cost
                 self.pregnant = True
                 self.gestation_timer = self.gestation_duration
                 self.reproduction_cooldown = self.reproduction_cooldown_duration
                 mate.reproduction_cooldown = mate.reproduction_cooldown_duration
+               
+                self.father_genes = { 
+                    'speed': mate.speed, 
+                    'vision': mate.vision_range,
+                    'max_age': mate.max_age
+                }
+               
                 return None
+            
+
 
         return None
 
@@ -98,18 +132,6 @@ class erf(BaseCreature):
                 target = min(mates, key=lambda m: math.dist(self.position, m.position))
                 self.move_toward(target.position, world_width, world_height)
                 return # Priority: Mating over Food/Wander
-
-        # new logic tree:
-        # note: need to make water and food consumption faster than the thirst and hunger rates.
-        # that way if the resources are spread out, the erfs wont get be stuck getting resources.
-        # if (w <= 50) and (f >= 50):
-        # elif (w <= 50) or (if <= 50):
-        #   if (w < f):
-        #      search water()
-        #   elif (f < w):
-        #       search food()
-        #   elif (f == w):
-        #       search w or f. random(50%)
 
         # Resources Logic
         if self.food_level < self.reproduction_threshold or self.water_level < self.reproduction_threshold:
@@ -163,8 +185,12 @@ class erf(BaseCreature):
     def __str__(self):
         sex_label = "F" if self.sex else "M"
         status = "pregnant" if self.pregnant else "alive"
-        return (f"erf [{sex_label}] | Age: {self.age} | "
+        
+        # New: Genetic trait summary
+        genes = f"S:{self.speed:.2f} | V:{self.vision_range:.1f} | MA:{self.max_age:.0f}"
+
+        return (f"erf [{sex_label}] | {genes} | Age: {self.age:.1f} | "
                 f"food_level: {self.food_level}/{self.food_capacity} | "
                 f"water_level: {self.water_level}/{self.water_capacity} | "
-                f"Position: ({self.position[0]:.1f}, {self.position[1]:.1f}) | "
+                f"Pos: ({self.position[0]:.1f}, {self.position[1]:.1f}) | "
                 f"{status}")

@@ -89,13 +89,13 @@ class Simulation:
         """Loads the last saved state of a run using dictionary keys."""
         result = db.get_last_tick(run_id)
         if not result:
-            print(f"⚠️ No saved state found for run_id: {run_id}")
+            print(f"No saved state found for run_id: {run_id}")
             return
 
         # result is a sqlite3.Row, access by name
         tick_id = result["id"]
         self.tick_count = result["tick_number"]
-        print(f"🔄 Resuming from tick {self.tick_count}...")
+        print(f"Resuming from tick {self.tick_count}...")
 
         # Clear current simulation state to avoid duplicates
         self.creatures.clear()
@@ -116,7 +116,12 @@ class Simulation:
             species_name = row["species"]
             if species_name in species_map:
                 creature_class = species_map[species_name]
-                creature = creature_class(pos)
+                creature = creature_class(
+                    pos, 
+                    speed=row["speed"], 
+                    vision_range=row["vision_range"], 
+                    max_age=row["max_age"]
+                )
                 creature.id = row["creature_id"]
                 # Convert "F"/"M" or 0/1 back to simulation booleans
                 creature.sex = True if row["sex"] == "F" else False
@@ -126,7 +131,7 @@ class Simulation:
                 creature.alive = bool(row["alive"])
                 self.add_creature(creature)
             else:
-                print(f"⚠️ Unknown species found in DB: {species_name}")
+                print(f"Unknown species found in DB: {species_name}")
 
         # reload resources
         for row in db.get_resource_states(tick_id):
@@ -143,7 +148,7 @@ class Simulation:
                 water.quantity = row["quantity"]
                 self.add_water(water)
 
-        print(f"✅ Resume complete: {len(self.creatures)} creatures restored.")
+        print(f"Resume complete: {len(self.creatures)} creatures restored.")
 
     def run(self, ticks=999999):
         """Runs the simulation loop for a given number of ticks.

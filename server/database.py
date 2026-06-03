@@ -28,7 +28,7 @@ class Database:
         
         self.current_run_id = None
         self.create_tables()
-        print(f"Database connected: {db_path} (WAL Mode Enabled)")
+        #print(f"Database connected: {db_path} (WAL Mode Enabled)")
 
     def create_tables(self):
         self.cursor.executescript('''
@@ -44,7 +44,8 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 tick_id INTEGER, creature_id TEXT, species TEXT, sex TEXT,
                 age INTEGER, food_level REAL, water_level REAL,
-                pos_x REAL, pos_y REAL, alive INTEGER
+                pos_x REAL, pos_y REAL, alive INTEGER,
+                speed REAL, vision_range REAL, max_age REAL                  
             );
             CREATE TABLE IF NOT EXISTS resource_states (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +58,7 @@ class Database:
     def resume_run(self, run_id):
         """Sets the current run context to an existing ID."""
         self.current_run_id = run_id
-        print(f"📂 Resuming run id: {run_id}")
+        print(f"Resuming run id: {run_id}")
 
     def get_last_tick(self, run_id):
         """Returns the most recent tick for a specific run."""
@@ -100,9 +101,30 @@ class Database:
         return self.cursor.lastrowid
 
     def save_creature_states(self, tick_id, creatures):
-        data = [(tick_id, c.id, c.name, "F" if c.sex else "M", c.age, c.food_level, c.water_level, c.position[0], c.position[1], 1 if c.alive else 0) 
-                for c in creatures.values()]
-        self.cursor.executemany('INSERT INTO creature_states (tick_id, creature_id, species, sex, age, food_level, water_level, pos_x, pos_y, alive) VALUES (?,?,?,?,?,?,?,?,?,?)', data)
+        data = [
+            (
+                tick_id, 
+                c.id, 
+                c.name, 
+                "F" if getattr(c, 'sex', True) else "M", 
+                c.age, 
+                c.food_level, 
+                c.water_level, 
+                c.position[0], 
+                c.position[1], 
+                1 if c.alive else 0,
+                c.speed,          # New
+                c.vision_range,   # New
+                c.max_age         # New
+            ) 
+            for c in creatures.values()
+        ]
+        
+        self.cursor.executemany('''
+            INSERT INTO creature_states (
+                tick_id, creature_id, species, sex, age, food_level, water_level, 
+                pos_x, pos_y, alive, speed, vision_range, max_age
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''', data)
         self.connection.commit()
 
     def save_resource_states(self, tick_id, food, water):
